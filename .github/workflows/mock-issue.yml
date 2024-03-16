@@ -1,0 +1,22 @@
+# name: '[MOCK] E/App Issue'
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       issue_id:
+#         description: 'Issue ID'
+#         required: true
+#       github_handles:
+#         description: 'Contributors GH handle (comma-separated)'
+#         required: true
+
+# jobs:
+#   replicate-issue:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+#     - name: Run mocking script
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       run: python mock_issue.py ${{ github.event.inputs.issue_id }} ${{ github.event.inputs.github_handles }}
