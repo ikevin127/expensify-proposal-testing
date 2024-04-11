@@ -21,10 +21,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
+          ISSUE: ${{ toJson(github.event.issue) }}
+          COMMENT: ${{ toJson(github.event.comment) }}
         run: node .github/scripts/issue-comment.js
-        with:
-          issue: ${{ toJson(github.event.issue) }}
-          comment: ${{ toJson(github.event.comment) }}
 
       # Checks if the comment is edited and if proposal template is followed
       - name: Run issue comment edited script
@@ -33,7 +32,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
+          ISSUE: ${{ toJson(github.event.issue) }}
+          COMMENT: ${{ toJson(github.event.comment) }}
         run: node .github/scripts/issue-comment-edit.js
-        with:
-          issue: ${{ toJson(github.event.issue) }}
-          comment: ${{ toJson(github.event.comment) }}

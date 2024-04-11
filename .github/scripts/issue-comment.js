@@ -1,6 +1,6 @@
 // Import GitHub toolkit and Octokit REST client
 const { context, getOctokit } = require('@actions/github');
-const OpenAI = require('openai');
+const InitOpenAI = require('openai');
 
 const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
 
