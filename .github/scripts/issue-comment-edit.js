@@ -78,7 +78,7 @@ async function handleIssueCommentEdited(octokit, labelNames) {
                             const formattedDate = date.toISOString()?.split('.')?.[0]?.replace('T', ' ') + ' UTC';
                             extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
                             
-                            const editComment = context.issue({
+                            const editComment = octokit.issue({
                                 repo: payload.repository.name,
                                 owner: payload.repository.owner.login,
                                 comment_id: payload.comment.id,
