@@ -75,7 +75,7 @@ async function handleIssueCommentCreated(octokit, labelNames) {
                             console.log('issue_comment.created - [NO_ACTION] w/ context: ', noActionContext);
                             return;
                         }
-
+                        console.log('payload.comment', payload.comment);
                         // replace {user} from response template with @username
                         assistantResponse = assistantResponse.replace('{user}', `@${payload.comment.user.login}`);
                         // replace {proposalLink} from response template with the link to the comment
