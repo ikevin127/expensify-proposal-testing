@@ -14,6 +14,10 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Install dependencies
+        run: npm install
+        working-directory: .github/scripts
+
       # Checks if the comment is created and follows the template
       - name: Run issue new comment script
         if: github.event.action == 'created'
