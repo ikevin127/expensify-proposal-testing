@@ -16,8 +16,8 @@ async function handleIssueCommentEdited(octokit, labelNames) {
     
     // check if the issue is opened and the has all passed labels
     if (
-        issue.state === 'open' &&
-        labelNames.every(labelName => issue.labels.some(issueLabel => issueLabel.name === labelName))
+        payload.issue.state === 'open' &&
+        labelNames.every(labelName => payload.issue.labels.some(issueLabel => issueLabel.name === labelName))
     ) {
         if (!OPENAI_ASSISTANT_ID) {
             console.log('OPENAI_ASSISTANT_ID missing from the environment variables');
