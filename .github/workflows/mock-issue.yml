@@ -1,22 +1,39 @@
-# name: '[MOCK] E/App Issue'
+name: Issue Comment Workflow
+on:
+  issue_comment:
+    types: [created, edited]
 
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       issue_id:
-#         description: 'Issue ID'
-#         required: true
-#       github_handles:
-#         description: 'Contributors GH handle (comma-separated)'
-#         required: true
+jobs:
+  process-issue-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-# jobs:
-#   replicate-issue:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v3
-#     - name: Run mocking script
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       run: python mock_issue.py ${{ github.event.inputs.issue_id }} ${{ github.event.inputs.github_handles }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      # Checks if the comment is created and follows the template
+      - name: Run issue new comment script
+        if: github.event.action == 'created'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
+        run: node .github/scripts/issue-comment.js
+        with:
+          issue: ${{ toJson(github.event.issue) }}
+          comment: ${{ toJson(github.event.comment) }}
+
+      # Checks if the comment is edited and if proposal template is followed
+      - name: Run issue comment edited script
+        if: github.event.action == 'edited'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
+        run: node .github/scripts/issue-comment-edit.js
+        with:
+          issue: ${{ toJson(github.event.issue) }}
+          comment: ${{ toJson(github.event.comment) }}
