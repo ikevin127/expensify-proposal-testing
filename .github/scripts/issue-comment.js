@@ -85,9 +85,12 @@ async function handleIssueCommentCreated(octokit, labelNames) {
                         // response contains double quotes / sometimes it doesn't
                         assistantResponse = assistantResponse.replace('"', '');
                         // create a comment with the assistant's response
-                        const postComment = octokit.issue({body: assistantResponse});
                         console.log('issue_comment.created - proposal-police posts comment');
-                        return octokit.issues.createComment(postComment);
+                        return octokit.issues.createComment({
+                            ...context.repo,
+                            issue_number: payload.issue.number,
+                            body: assistantResponse
+                        });
                     });
                 }).catch(err => console.log('threads.messages.list - err', err));
 

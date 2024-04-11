@@ -77,16 +77,13 @@ async function handleIssueCommentEdited(octokit, labelNames) {
                             const date = new Date(payload.comment.updated_at);
                             const formattedDate = date.toISOString()?.split('.')?.[0]?.replace('T', ' ') + ' UTC';
                             extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
-                            
-                            const editComment = octokit.issue({
-                                repo: payload.repository.name,
-                                owner: payload.repository.owner.login,
+            
+                            console.log(`issue_comment.edited - proposal-police edits comment: ${payload.comment.id}`);
+                            return octokit.issues.updateComment({
+                                ...context.repo,
                                 comment_id: payload.comment.id,
                                 body: `${extractedNotice}\n\n` + payload.comment.body,
                             });
-            
-                            console.log(`issue_comment.edited - proposal-police edits comment: ${payload.comment.id}`);
-                            return octokit.issues.updateComment(editComment);
                         }
         
                         return false;
