@@ -1,8 +1,9 @@
 // Import GitHub toolkit and Octokit REST client
+import type { GitHub } from '@actions/github/lib/utils';
 import { context, getOctokit } from '@actions/github';
 import InitOpenAI from 'openai';
 
-// @ts-expect-error - process is not imported
+// @ts-ignore - process is not imported
 const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 /**
@@ -11,15 +12,15 @@ const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
  * @param {*} labelNames - String array of label names to check for, ex. ['Help Wanted', "External"]
  * @returns {Promise<false | undefined>}
  */
-async function handleIssueCommentEdited(octokit, labelNames) {
+async function handleIssueCommentEdited(octokit: InstanceType<typeof GitHub>, labelNames: string[]) {
     const payload = context.payload;
-    // @ts-expect-error - process is not imported
+    // @ts-ignore - process is not imported
     const OPENAI_ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID;
     
     // check if the issue is opened and the has all passed labels
     if (
         payload.issue?.state === 'open' &&
-        labelNames.every(labelName => payload.issue?.labels.some(issueLabel => issueLabel.name === labelName))
+        labelNames.every((labelName: string) => payload.issue?.labels.some((issueLabel: {name: string}) => issueLabel.name === labelName))
     ) {
         if (!OPENAI_ASSISTANT_ID) {
             console.log('OPENAI_ASSISTANT_ID missing from the environment variables');
@@ -83,7 +84,7 @@ async function handleIssueCommentEdited(octokit, labelNames) {
                             console.log(`issue_comment.edited - proposal-police edits comment: ${payload.comment?.id}`);
                             return octokit.issues.updateComment({
                                 ...context.repo,
-                                comment_id: payload.comment?.id,
+                                comment_id: payload.comment?.id as number,
                                 body: `${extractedNotice}\n\n` + payload.comment?.body,
                             });
                         }
@@ -107,13 +108,13 @@ async function handleIssueCommentEdited(octokit, labelNames) {
 }
 
 async function run() {
-    // @ts-expect-error - process is not imported
+    // @ts-ignore - process is not imported
     const octokit = getOctokit(process.env.GITHUB_TOKEN);
     await handleIssueCommentEdited(octokit, ['Help Wanted']);
 }
 
 run().catch(error => {
     console.error(error);
-    // @ts-expect-error - process is not imported
+    // @ts-ignore - process is not imported
     process.exit(1);
 });

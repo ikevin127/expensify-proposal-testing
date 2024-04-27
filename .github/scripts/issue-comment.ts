@@ -1,8 +1,9 @@
 // Import GitHub toolkit and Octokit REST client
+import type { GitHub } from '@actions/github/lib/utils';
 import { context, getOctokit } from '@actions/github';
 import InitOpenAI from 'openai';
 
-// @ts-expect-error - process is not imported
+// @ts-ignore - process is not imported
 const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 /**
@@ -11,15 +12,15 @@ const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
  * @param {*} labelNames - String array of label names to check for, ex. ['Help Wanted', "External"]
  * @returns {Promise<false | undefined>}
  */
-async function handleIssueCommentCreated(octokit, labelNames) {
+async function handleIssueCommentCreated(octokit: InstanceType<typeof GitHub>, labelNames: string[]) {
     const payload = context.payload;
-// @ts-expect-error - process is not imported
+    // @ts-ignore - process is not imported
     const OPENAI_ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID;
 
     // check if the issue is opened and the has all passed labels
     if (
         payload.issue?.state === 'open' &&
-        labelNames.every(labelName => payload.issue?.labels.some(issueLabel => issueLabel.name === labelName))
+        labelNames.every((labelName: string) => payload.issue?.labels.some((issueLabel: {name: string}) => issueLabel.name === labelName))
     ) {
         if (!OPENAI_ASSISTANT_ID) {
             console.log('OPENAI_ASSISTANT_ID missing from the environment variables');
@@ -89,7 +90,7 @@ async function handleIssueCommentCreated(octokit, labelNames) {
                         console.log('issue_comment.created - proposal-police posts comment');
                         return octokit.issues.createComment({
                             ...context.repo,
-                            issue_number: payload.issue?.number,
+                            issue_number: payload.issue?.number as number,
                             body: assistantResponse
                         });
                     });
@@ -111,13 +112,13 @@ async function handleIssueCommentCreated(octokit, labelNames) {
 
 // Main function to process the workflow event
 async function run() {
-    // @ts-expect-error - process is not imported
+    // @ts-ignore - process is not imported
     const octokit = getOctokit(process.env.GITHUB_TOKEN);
     await handleIssueCommentCreated(octokit, ['Help Wanted']);
 }
 
 run().catch(error => {
     console.error(error);
-    // @ts-expect-error - process is not imported
+    // @ts-ignore - process is not imported
     process.exit(1);
 });
