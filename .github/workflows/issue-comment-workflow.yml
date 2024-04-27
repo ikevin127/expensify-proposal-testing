@@ -27,7 +27,7 @@ jobs:
           OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
           ISSUE: ${{ toJson(github.event.issue) }}
           COMMENT: ${{ toJson(github.event.comment) }}
-        run: node .github/scripts/issue-comment.js
+        run: npx ts-node .github/scripts/issue-comment.ts
 
       # Checks if the comment is edited and if proposal template is followed
       - name: Run issue comment edited script
@@ -38,4 +38,4 @@ jobs:
           OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
           ISSUE: ${{ toJson(github.event.issue) }}
           COMMENT: ${{ toJson(github.event.comment) }}
-        run: node .github/scripts/issue-comment-edit.js
+        run: npx ts-node .github/scripts/issue-comment-edit.ts
