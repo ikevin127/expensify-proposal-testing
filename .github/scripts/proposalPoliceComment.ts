@@ -1,8 +1,8 @@
 import {context, getOctokit} from '@actions/github';
 import InitOpenAI from 'openai';
-import CONST from '../libs/CONST';
-import type {GitHubType} from '../libs/OpenAIUtils';
-import * as OpenAIUtils from '../libs/OpenAIUtils';
+import CONST from './libs/CONST';
+import type {GitHubType} from './libs/OpenAIUtils';
+import * as OpenAIUtils from './libs/OpenAIUtils';
 
 // @ts-ignore - process is not imported
 const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
