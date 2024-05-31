@@ -18,9 +18,10 @@ jobs:
         run: npm install
         working-directory: .github/scripts
 
-      # Checks if the comment is created and follows the template
-      - name: Run issue new comment script
-        if: github.event.action == 'created'
+      # Checks if the comment is created and follows the template OR
+      # if the comment is edited and if proposal template is followed.
+      # Action type logic can be found in the script files.
+      - name: Run comment check script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -28,14 +29,3 @@ jobs:
           ISSUE: ${{ toJson(github.event.issue) }}
           COMMENT: ${{ toJson(github.event.comment) }}
         run: npx ts-node .github/scripts/proposalPoliceComment.ts
-
-      # Checks if the comment is edited and if proposal template is followed
-      - name: Run issue comment edited script
-        if: github.event.action == 'edited'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
-          ISSUE: ${{ toJson(github.event.issue) }}
-          COMMENT: ${{ toJson(github.event.comment) }}
-        run: npx ts-node .github/scripts/proposalPoliceCommentEdit.ts
