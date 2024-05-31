@@ -6,6 +6,7 @@ import type {Constructor} from '@octokit/core/dist-types/types';
 import type {PaginateInterface} from '@octokit/plugin-paginate-rest';
 import type {RestEndpointMethods} from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
 
+// @ts-ignore - process is not imported
 const OpenAI = new InitOpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 export declare const GitHubType: (new (...args: unknown[]) => Record<string, unknown>) & {
@@ -44,6 +45,7 @@ async function prompt({createAndRunResponse, payload, octokit}: OpenAIUtilsPromp
                         .then((threadMessages) => {
                             // list thread messages content
                             threadMessages.data.forEach((message, index) => {
+                                // @ts-ignore - we do have `text` in content[0] but typescript doesn't know that this is an 'openai' package type issue
                                 let assistantResponse = message.content?.[index]?.text?.value as string;
                                 console.log('issue_comment.created - assistantResponse', assistantResponse);
 
@@ -141,6 +143,7 @@ async function promptEdit({createAndRunResponse, payload, octokit}: OpenAIUtilsP
                         .then((threadMessages) => {
                             // list thread messages content
                             threadMessages.data.forEach((message, index) => {
+                                // @ts-ignore - we do have `text` in content[0] but typescript doesn't know that this is an 'openai' package type issue
                                 const assistantResponse = message.content?.[index]?.text?.value as string;
                                 console.log('issue_comment.edited - assistantResponse', assistantResponse);
 
