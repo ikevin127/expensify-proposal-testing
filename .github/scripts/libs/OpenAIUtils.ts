@@ -2,7 +2,6 @@ import CONST from './CONST';
 import OpenAI from 'openai';
 import {getInput} from '@actions/core';
 import type {Octokit} from '@octokit/core';
-import type {Constructor} from '@octokit/core/types';
 import type {PaginateInterface} from '@octokit/plugin-paginate-rest';
 import type {MessageContent, TextContentBlock} from 'openai/resources/beta/threads/index';
 import type {RestEndpointMethods} from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
@@ -75,6 +74,7 @@ class OpenAIUtils {
     }
 }
 
+type Constructor<T> = new (...args: any[]) => T;
 
 export declare const GitHubType: (new (...args: unknown[]) => Record<string, unknown>) & {
     new (...args: unknown[]): Record<string, unknown>;
