@@ -23,7 +23,7 @@ jobs:
       # if the comment is edited and if proposal template is followed.
       # Action type logic can be found in the script files.
       - name: Run ProposalPolice™ Comment Check Script
-        uses: .github/scripts/proposalPoliceComment.js
+        uses: ./.github/scripts/proposalPoliceComment.js
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
