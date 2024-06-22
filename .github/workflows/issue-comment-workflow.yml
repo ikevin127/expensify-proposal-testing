@@ -4,8 +4,9 @@ on:
     types: [created, edited]
 
 jobs:
-  process-issue-comment:
+  proposal-police-workflow:
     runs-on: ubuntu-latest
+    if: !contains(fromJSON('["OSBotify", "imgbot[bot]", "melvin-bot[bot]"]'), github.actor)
     steps:
       - uses: actions/checkout@v2
 
@@ -21,7 +22,7 @@ jobs:
       # Checks if the comment is created and follows the template OR
       # if the comment is edited and if proposal template is followed.
       # Action type logic can be found in the script files.
-      - name: Run comment check script
+      - name: Run ProposalPolice™ Comment Check Script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
