@@ -57,6 +57,7 @@ class OpenAIUtils {
                 if (message.role !== CONST.OPENAI_ROLES.ASSISTANT) {
                     continue;
                 }
+                console.log('message.content:', message.content);
                 response += message.content
                     .map((contentBlock) => this.isTextContentBlock(contentBlock))
                     .join('\n')
