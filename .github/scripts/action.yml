@@ -13,3 +13,7 @@ inputs:
 runs:
   using: "node16"
   main: "./index.js"
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    OPENAI_ASSISTANT_ID: ${{ secrets.OPENAI_ASSISTANT_ID }}
