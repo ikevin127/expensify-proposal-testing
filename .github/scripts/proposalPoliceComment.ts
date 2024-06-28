@@ -29,8 +29,8 @@ async function run() {
         return;
     }
 
-    // Verify that the comment is not empty
-    if (!payload.comment?.body.trim()) {
+    // Verify that the comment is not empty and contains the case sensitive `Proposal` keyword
+    if (!payload.comment?.body.trim() || !payload.comment.body.includes(CONST.PROPOSAL_KEYWORD)) {
         return;
     }
 

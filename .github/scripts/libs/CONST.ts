@@ -13,6 +13,7 @@ const CONST = {
         USER: 'user',
         ASSISTANT: 'assistant',
     },
+    PROPOSAL_KEYWORD: 'Proposal',
     NO_ACTION: 'NO_ACTION',
     OPENAI_POLL_RATE: 1500,
     OPENAI_POLL_TIMEOUT: 90000,
