@@ -31,6 +31,7 @@ async function run() {
 
     // Verify that the comment is not empty and contains the case sensitive `Proposal` keyword
     if (!payload.comment?.body.trim() || !payload.comment.body.includes(CONST.PROPOSAL_KEYWORD)) {
+        console.log('Comment body is either empty or does not contain the keyword "Proposal"', payload.comment?.body);
         return;
     }
 
