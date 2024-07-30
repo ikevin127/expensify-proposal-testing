@@ -115,5 +115,5 @@ async function run() {
 run().catch((error) => {
     console.error(error);
     // @ts-ignore - process is not imported
-    process.exit(1);
+    process.exit(0); // Zero status ensures no failure notification
 });
