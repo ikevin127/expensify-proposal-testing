@@ -49,7 +49,8 @@ async function run() {
         : `I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH "${CONST.NO_ACTION}" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ${payload.changes.body?.from}.\n\nEdited comment content: ${payload.comment?.body}`;
 
     const assistantResponse = await OpenAIUtils.prompt(prompt);
-
+    console.log('assistantResponse: ', assistantResponse);
+    
     // check if assistant response is either NO_ACTION or "NO_ACTION" strings
     // as sometimes the assistant response varies
     // @ts-ignore - process is not imported
