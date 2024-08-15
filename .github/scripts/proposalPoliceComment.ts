@@ -15,6 +15,7 @@ function isCommentCreatedEvent(payload: IssueCommentEvent): payload is IssueComm
 
 // Main function to process the workflow event
 async function run() {
+    const date = new Date();
     // @ts-ignore - process is not imported
     const octokit: InstanceType<typeof GitHubType> = getOctokit(process.env.GITHUB_TOKEN);
     // Verify this is running for an expected webhook event
@@ -98,9 +99,7 @@ async function run() {
             // extract the text after [EDIT_COMMENT] from assistantResponse since this is a
             // bot related action keyword
             let extractedNotice = assistantResponse.split('[EDIT_COMMENT] ')?.[1]?.replace('"', '');
-            // format the github's updated_at like: 2024-01-24 13:15:24 UTC not 2024-01-28 18:18:28.000 UTC
-            const date = new Date();
-            console.log('date', date, date.toISOString());
+            // format the date like: 2024-01-24 13:15:24 UTC not 2024-01-28 18:18:28.000 UTC
             const formattedDate = `${date.toISOString()?.split('.')?.[0]?.replace('T', ' ')} UTC`;
             extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
             console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
