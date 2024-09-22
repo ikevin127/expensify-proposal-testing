@@ -20,8 +20,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -49,6 +49,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@actions/core");
 var github_1 = require("@actions/github");
+var date_fns_1 = require("date-fns");
+var date_fns_tz_1 = require("date-fns-tz");
 var CONST_1 = require("./libs/CONST");
 var OpenAIUtils_1 = require("./libs/OpenAIUtils");
 function isCommentCreatedOrEditedEvent(payload) {
@@ -60,12 +62,14 @@ function isCommentCreatedEvent(payload) {
 // Main function to process the workflow event
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var date, octokit, payload, prompt, assistantResponse, isNoAction, noActionContext, formattedResponse, extractedNotice, formattedDate;
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
-        return __generator(this, function (_0) {
-            switch (_0.label) {
+        var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, isNoAction, noActionContext, formattedResponse, extractedNotice;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
+        return __generator(this, function (_x) {
+            switch (_x.label) {
                 case 0:
-                    date = new Date();
+                    now = Date.now();
+                    zonedDate = (0, date_fns_tz_1.utcToZonedTime)(now, 'UTC');
+                    formattedDate = (0, date_fns_1.format)(zonedDate, "yyyy-MM-dd HH:mm:ss 'UTC'");
                     octokit = (0, github_1.getOctokit)(process.env.GITHUB_TOKEN);
                     // Verify this is running for an expected webhook event
                     if (github_1.context.eventName !== CONST_1.default.EVENTS.ISSUE_COMMENT) {
@@ -93,7 +97,7 @@ function run() {
                         : "I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH \"".concat(CONST_1.default.NO_ACTION, "\" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ").concat((_h = payload.changes.body) === null || _h === void 0 ? void 0 : _h.from, ".\n\nEdited comment content: ").concat((_j = payload.comment) === null || _j === void 0 ? void 0 : _j.body);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
                 case 1:
-                    assistantResponse = _0.sent();
+                    assistantResponse = _x.sent();
                     console.log('assistantResponse: ', assistantResponse);
                     isNoAction = assistantResponse.trim().replaceAll(' ', '_').replaceAll('"', '').toUpperCase() === CONST_1.default.NO_ACTION;
                     // If assistant response is NO_ACTION, do nothing
@@ -123,20 +127,19 @@ function run() {
                             /* eslint-disable @typescript-eslint/naming-convention */
                             issue_number: (_q = (_p = payload.issue) === null || _p === void 0 ? void 0 : _p.number) !== null && _q !== void 0 ? _q : -1, body: formattedResponse }))];
                 case 2:
-                    _0.sent();
+                    _x.sent();
                     return [3 /*break*/, 5];
                 case 3:
                     if (!(assistantResponse.includes('[EDIT_COMMENT]') && !((_r = payload.comment) === null || _r === void 0 ? void 0 : _r.body.includes('Edited by **proposal-police**')))) return [3 /*break*/, 5];
                     extractedNotice = (_t = (_s = assistantResponse.split('[EDIT_COMMENT] ')) === null || _s === void 0 ? void 0 : _s[1]) === null || _t === void 0 ? void 0 : _t.replace('"', '');
-                    formattedDate = "".concat((_w = (_v = (_u = date.toISOString()) === null || _u === void 0 ? void 0 : _u.split('.')) === null || _v === void 0 ? void 0 : _v[0]) === null || _w === void 0 ? void 0 : _w.replace('T', ' '), " UTC");
                     extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
                     console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { 
                             /* eslint-disable @typescript-eslint/naming-convention */
-                            comment_id: (_y = (_x = payload.comment) === null || _x === void 0 ? void 0 : _x.id) !== null && _y !== void 0 ? _y : -1, body: "".concat(extractedNotice, "\n\n").concat((_z = payload.comment) === null || _z === void 0 ? void 0 : _z.body) }))];
+                            comment_id: (_v = (_u = payload.comment) === null || _u === void 0 ? void 0 : _u.id) !== null && _v !== void 0 ? _v : -1, body: "".concat(extractedNotice, "\n\n").concat((_w = payload.comment) === null || _w === void 0 ? void 0 : _w.body) }))];
                 case 4:
-                    _0.sent();
-                    _0.label = 5;
+                    _x.sent();
+                    _x.label = 5;
                 case 5: return [2 /*return*/];
             }
         });

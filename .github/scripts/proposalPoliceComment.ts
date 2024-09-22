@@ -1,9 +1,12 @@
 import {setFailed} from '@actions/core';
 import {context, getOctokit} from '@actions/github';
 import type {IssueCommentCreatedEvent, IssueCommentEditedEvent, IssueCommentEvent} from '@octokit/webhooks-types';
+import {format} from 'date-fns';
+import {utcToZonedTime} from 'date-fns-tz';
 import CONST from './libs/CONST';
 import OpenAIUtils from './libs/OpenAIUtils';
 import type {GitHubType} from './libs/OpenAIUtils';
+
 
 function isCommentCreatedOrEditedEvent(payload: IssueCommentEvent): payload is IssueCommentCreatedEvent | IssueCommentEditedEvent {
     return payload.action === CONST.ACTIONS.CREATED || payload.action === CONST.ACTIONS.EDIT;
@@ -15,7 +18,11 @@ function isCommentCreatedEvent(payload: IssueCommentEvent): payload is IssueComm
 
 // Main function to process the workflow event
 async function run() {
-    const date = new Date();
+    // Capture the timestamp immediately at the start of the run
+    const now = Date.now();
+    const zonedDate = utcToZonedTime(now, 'UTC');
+    const formattedDate = format(zonedDate, "yyyy-MM-dd HH:mm:ss 'UTC'");
+
     // @ts-ignore - process is not imported
     const octokit: InstanceType<typeof GitHubType> = getOctokit(process.env.GITHUB_TOKEN);
     // Verify this is running for an expected webhook event
@@ -99,8 +106,6 @@ async function run() {
             // extract the text after [EDIT_COMMENT] from assistantResponse since this is a
             // bot related action keyword
             let extractedNotice = assistantResponse.split('[EDIT_COMMENT] ')?.[1]?.replace('"', '');
-            // format the date like: 2024-01-24 13:15:24 UTC not 2024-01-28 18:18:28.000 UTC
-            const formattedDate = `${date.toISOString()?.split('.')?.[0]?.replace('T', ' ')} UTC`;
             extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
             console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
             await octokit.issues.updateComment({
