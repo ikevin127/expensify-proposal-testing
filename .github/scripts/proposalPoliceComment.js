@@ -53,18 +53,18 @@ var date_fns_1 = require("date-fns");
 var date_fns_tz_1 = require("date-fns-tz");
 var CONST_1 = require("./libs/CONST");
 var OpenAIUtils_1 = require("./libs/OpenAIUtils");
-function replacer(str) {
-    var _a;
-    return ((_a = {
-        '\\': '\\\\',
-        '\t': '\\t',
-        '\n': '\\n',
-        '\r': '\\r',
-        '\f': '\\f',
-        '"': '\\"',
-    }[str]) !== null && _a !== void 0 ? _a : '');
-}
 function sanitizeJSONStringValues(inputString) {
+    function replacer(str) {
+        var _a;
+        return ((_a = {
+            '\\': '\\\\',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\r': '\\r',
+            '\f': '\\f',
+            '"': '\\"',
+        }[str]) !== null && _a !== void 0 ? _a : '');
+    }
     if (typeof inputString !== 'string') {
         throw new TypeError('Input must be of type String.');
     }
@@ -80,7 +80,8 @@ function sanitizeJSONStringValues(inputString) {
             }
             if (obj && typeof obj === 'object') {
                 var result = {};
-                for (var key in obj) {
+                for (var _i = 0, _a = Object.keys(obj); _i < _a.length; _i++) {
+                    var key = _a[_i];
                     result[key] = sanitizeValues_1(obj[key]);
                 }
                 return result;
