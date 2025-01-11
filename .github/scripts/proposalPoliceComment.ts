@@ -7,13 +7,60 @@ import CONST from './libs/CONST';
 import OpenAIUtils from './libs/OpenAIUtils';
 import type {GitHubType} from './libs/OpenAIUtils';
 
-
-function isCommentCreatedOrEditedEvent(payload: IssueCommentEvent): payload is IssueCommentCreatedEvent | IssueCommentEditedEvent {
-    return payload.action === CONST.ACTIONS.CREATED || payload.action === CONST.ACTIONS.EDIT;
+type AssistantResponse = {
+    action: typeof CONST.NO_ACTION | typeof CONST.ACTION_REQUIRED;
+    message: string;
 }
+
+function replacer(str: string): string {
+    return ({
+        '\\': '\\\\',
+        '\t': '\\t',
+        '\n': '\\n',
+        '\r': '\\r',
+        '\f': '\\f',
+        '"': '\\"',
+    }[str] ?? '');
+}
+
+function sanitizeJSONStringValues(inputString: string): string {
+    if (typeof inputString !== 'string') {
+        throw new TypeError('Input must be of type String.');
+    }
+
+    try {
+        const parsed = JSON.parse(inputString);
+        
+        // Function to recursively sanitize string values in an object
+        const sanitizeValues = (obj: any): any => {
+            if (typeof obj === 'string') {
+                return obj.replace(/\\|\t|\n|\r|\f|"/g, replacer);
+            }
+            if (Array.isArray(obj)) {
+                return obj.map(item => sanitizeValues(item));
+            }
+            if (obj && typeof obj === 'object') {
+                const result: Record<string, any> = {};
+                for (const key in obj) {
+                    result[key] = sanitizeValues(obj[key]);
+                }
+                return result;
+            }
+            return obj;
+        };
+
+        return JSON.stringify(sanitizeValues(parsed));
+    } catch (e) {
+        throw new Error('Invalid JSON input.');
+    }
+};
 
 function isCommentCreatedEvent(payload: IssueCommentEvent): payload is IssueCommentCreatedEvent {
     return payload.action === CONST.ACTIONS.CREATED;
+}
+
+function isCommentEditedEvent(payload: IssueCommentEvent): payload is IssueCommentEditedEvent {
+    return payload.action === CONST.ACTIONS.EDITED;
 }
 
 // Main function to process the workflow event
@@ -43,10 +90,16 @@ async function run() {
         return;
     }
 
+    // If event is `edited` and comment was already edited by the bot, return early
+    if (isCommentEditedEvent(payload) && payload.comment?.body.trim().includes('Edited by **proposal-police**')) {
+        console.log('Comment was already edited by proposal-police once.\n', payload.comment?.body);
+        return;
+    }
+
     console.log('ProposalPolice™ Action triggered for comment:', payload.comment?.body);
     console.log('-> GitHub Action Type: ', payload.action?.toUpperCase());
 
-    if (!isCommentCreatedOrEditedEvent(payload)) {
+    if (!isCommentCreatedEvent(payload) && !isCommentEditedEvent(payload)) {
         console.error('Unsupported action type:', payload?.action);
         setFailed(new Error(`Unsupported action type ${payload?.action}`));
         return;
@@ -57,30 +110,28 @@ async function run() {
         : `I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH "${CONST.NO_ACTION}" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ${payload.changes.body?.from}.\n\nEdited comment content: ${payload.comment?.body}`;
 
     const assistantResponse = await OpenAIUtils.prompt(prompt);
-    console.log('assistantResponse: ', assistantResponse);
-    
-    // check if assistant response is either NO_ACTION or "NO_ACTION" strings
-    // as sometimes the assistant response varies
-    // @ts-ignore - process is not imported
-    const isNoAction = assistantResponse.trim().replaceAll(' ', '_').replaceAll('"', '').toUpperCase() === CONST.NO_ACTION;
+    const parsedAssistantResponse: AssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
+    console.log('parsedAssistantResponse: ', parsedAssistantResponse);
 
-    // If assistant response is NO_ACTION, do nothing
-    if (isNoAction) {
-        console.log('Detected NO_ACTION for comment, returning early');
+    // fallback to empty strings to avoid crashing in case parsing fails and we fallback to empty object
+    const {action = "", message = ""} = parsedAssistantResponse ?? {};
+    const isNoAction = action.trim().toUpperCase() === CONST.NO_ACTION;
+    const isActionRequired = action.trim().toUpperCase() === CONST.ACTION_REQUIRED;
+
+    // If assistant response is NO_ACTION and there's no message, do nothing
+    if (isNoAction && !message) {
+        console.log('Detected NO_ACTION for comment, returning early.');
         return;
     }
 
-    // if the assistant responded with no action but there's some context in the response
-    if (assistantResponse.includes(`[${CONST.NO_ACTION}]`)) {
-        // extract the text after [NO_ACTION] from assistantResponse since this is a
-        // bot related action keyword
-        const noActionContext = assistantResponse.split(`[${CONST.NO_ACTION}] `)?.[1]?.replace('"', '');
-        console.log('[NO_ACTION] w/ context: ', noActionContext);
+    // if the assistant responded with no action but there's some context in the message
+    if (isNoAction && !!message) {
+        console.log('[NO_ACTION] with Message: ', message);
         return;
     }
 
-    if (isCommentCreatedEvent(payload)) {
-        const formattedResponse = assistantResponse
+    if (isCommentCreatedEvent(payload) && isActionRequired) {
+        const formattedResponse = message
             // replace {user} from response template with @username
             // @ts-ignore - process is not imported
             .replaceAll('{user}', `@${payload.comment?.user.login}`)
@@ -100,21 +151,19 @@ async function run() {
             issue_number: payload.issue?.number ?? -1,
             body: formattedResponse,
         });
-    } else {
-        // edit comment if assistant detected substantial changes and if the comment was not edited already by the bot
-        if (assistantResponse.includes('[EDIT_COMMENT]') && !payload.comment?.body.includes('Edited by **proposal-police**')) {
-            // extract the text after [EDIT_COMMENT] from assistantResponse since this is a
-            // bot related action keyword
-            let extractedNotice = assistantResponse.split('[EDIT_COMMENT] ')?.[1]?.replace('"', '');
-            extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
-            console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
-            await octokit.issues.updateComment({
-                ...context.repo,
-                /* eslint-disable @typescript-eslint/naming-convention */
-                comment_id: payload.comment?.id ?? -1,
-                body: `${extractedNotice}\n\n${payload.comment?.body}`,
-            });
-        }
+    // edit comment if assistant detected substantial changes
+    } else if (isActionRequired && message.includes('[EDIT_COMMENT]')) {
+        // extract the text after [EDIT_COMMENT] from `message` since this is a
+        // bot related action keyword
+        let extractedNotice = message.split('[EDIT_COMMENT] ')?.[1]?.replace('"', '');
+        extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
+        console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
+        await octokit.issues.updateComment({
+            ...context.repo,
+            /* eslint-disable @typescript-eslint/naming-convention */
+            comment_id: payload.comment?.id ?? -1,
+            body: `${extractedNotice}\n\n${payload.comment?.body}`,
+        });
     }
 }
 
