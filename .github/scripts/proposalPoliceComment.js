@@ -104,10 +104,10 @@ function isCommentEditedEvent(payload) {
 // Main function to process the workflow event
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, parsedAssistantResponse, _a, _b, action, _c, message, isNoAction, isActionRequired, formattedResponse, extractedNotice;
-        var _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
-        return __generator(this, function (_z) {
-            switch (_z.label) {
+        var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, parsedAssistantResponse, _a, _b, action, _c, message, isNoAction, isActionEdit, isActionRequired, formattedResponse, formattedResponse;
+        var _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
+        return __generator(this, function (_x) {
+            switch (_x.label) {
                 case 0:
                     now = Date.now();
                     zonedDate = (0, date_fns_tz_1.utcToZonedTime)(now, 'UTC');
@@ -144,20 +144,16 @@ function run() {
                         : "I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH \"".concat(CONST_1.default.NO_ACTION, "\" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ").concat((_o = payload.changes.body) === null || _o === void 0 ? void 0 : _o.from, ".\n\nEdited comment content: ").concat((_p = payload.comment) === null || _p === void 0 ? void 0 : _p.body);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
                 case 1:
-                    assistantResponse = _z.sent();
+                    assistantResponse = _x.sent();
                     parsedAssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
                     console.log('parsedAssistantResponse: ', parsedAssistantResponse);
                     _a = parsedAssistantResponse !== null && parsedAssistantResponse !== void 0 ? parsedAssistantResponse : {}, _b = _a.action, action = _b === void 0 ? "" : _b, _c = _a.message, message = _c === void 0 ? "" : _c;
-                    isNoAction = action.trim().toUpperCase() === CONST_1.default.NO_ACTION;
-                    isActionRequired = action.trim().toUpperCase() === CONST_1.default.ACTION_REQUIRED;
+                    isNoAction = action.trim() === CONST_1.default.NO_ACTION;
+                    isActionEdit = action.trim() === CONST_1.default.ACTION_EDIT;
+                    isActionRequired = action.trim() === CONST_1.default.ACTION_REQUIRED;
                     // If assistant response is NO_ACTION and there's no message, do nothing
                     if (isNoAction && !message) {
                         console.log('Detected NO_ACTION for comment, returning early.');
-                        return [2 /*return*/];
-                    }
-                    // if the assistant responded with no action but there's some context in the message
-                    if (isNoAction && !!message) {
-                        console.log('[NO_ACTION] with Message: ', message);
                         return [2 /*return*/];
                     }
                     if (!(isCommentCreatedEvent(payload) && isActionRequired)) return [3 /*break*/, 3];
@@ -176,19 +172,18 @@ function run() {
                             /* eslint-disable @typescript-eslint/naming-convention */
                             issue_number: (_t = (_s = payload.issue) === null || _s === void 0 ? void 0 : _s.number) !== null && _t !== void 0 ? _t : -1, body: formattedResponse }))];
                 case 2:
-                    _z.sent();
+                    _x.sent();
                     return [3 /*break*/, 5];
                 case 3:
-                    if (!(isActionRequired && message.includes('[EDIT_COMMENT]'))) return [3 /*break*/, 5];
-                    extractedNotice = (_v = (_u = message.split('[EDIT_COMMENT] ')) === null || _u === void 0 ? void 0 : _u[1]) === null || _v === void 0 ? void 0 : _v.replace('"', '');
-                    extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
+                    if (!isActionEdit) return [3 /*break*/, 5];
+                    formattedResponse = message.replace('{updated_timestamp}', formattedDate);
                     console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { 
                             /* eslint-disable @typescript-eslint/naming-convention */
-                            comment_id: (_x = (_w = payload.comment) === null || _w === void 0 ? void 0 : _w.id) !== null && _x !== void 0 ? _x : -1, body: "".concat(extractedNotice, "\n\n").concat((_y = payload.comment) === null || _y === void 0 ? void 0 : _y.body) }))];
+                            comment_id: (_v = (_u = payload.comment) === null || _u === void 0 ? void 0 : _u.id) !== null && _v !== void 0 ? _v : -1, body: "".concat(formattedResponse, "\n\n").concat((_w = payload.comment) === null || _w === void 0 ? void 0 : _w.body) }))];
                 case 4:
-                    _z.sent();
-                    _z.label = 5;
+                    _x.sent();
+                    _x.label = 5;
                 case 5: return [2 /*return*/];
             }
         });

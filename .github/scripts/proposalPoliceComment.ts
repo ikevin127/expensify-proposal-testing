@@ -117,18 +117,13 @@ async function run() {
 
     // fallback to empty strings to avoid crashing in case parsing fails and we fallback to empty object
     const {action = "", message = ""} = parsedAssistantResponse ?? {};
-    const isNoAction = action.trim().toUpperCase() === CONST.NO_ACTION;
-    const isActionRequired = action.trim().toUpperCase() === CONST.ACTION_REQUIRED;
+    const isNoAction = action.trim() === CONST.NO_ACTION;
+    const isActionEdit = action.trim() === CONST.ACTION_EDIT;
+    const isActionRequired = action.trim() === CONST.ACTION_REQUIRED;
 
     // If assistant response is NO_ACTION and there's no message, do nothing
     if (isNoAction && !message) {
         console.log('Detected NO_ACTION for comment, returning early.');
-        return;
-    }
-
-    // if the assistant responded with no action but there's some context in the message
-    if (isNoAction && !!message) {
-        console.log('[NO_ACTION] with Message: ', message);
         return;
     }
 
@@ -154,17 +149,14 @@ async function run() {
             body: formattedResponse,
         });
     // edit comment if assistant detected substantial changes
-    } else if (isActionRequired && message.includes('[EDIT_COMMENT]')) {
-        // extract the text after [EDIT_COMMENT] from `message` since this is a
-        // bot related action keyword
-        let extractedNotice = message.split('[EDIT_COMMENT] ')?.[1]?.replace('"', '');
-        extractedNotice = extractedNotice.replace('{updated_timestamp}', formattedDate);
+    } else if (isActionEdit) {
+        const formattedResponse = message.replace('{updated_timestamp}', formattedDate);
         console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
         await octokit.issues.updateComment({
             ...context.repo,
             /* eslint-disable @typescript-eslint/naming-convention */
             comment_id: payload.comment?.id ?? -1,
-            body: `${extractedNotice}\n\n${payload.comment?.body}`,
+            body: `${formattedResponse}\n\n${payload.comment?.body}`,
         });
     }
 }
