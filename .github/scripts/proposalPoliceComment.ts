@@ -128,17 +128,12 @@ async function run() {
     }
 
     if (isCommentCreatedEvent(payload) && isActionRequired) {
+        console.log('payload.comment?.url', payload.comment?.url);
+        console.log('payload.comment?.html_url', payload.comment?.html_url);
         const formattedResponse = message
-            // replace {user} from response template with @username
-            // @ts-ignore - process is not imported
-            .replaceAll('{user}', `@${payload.comment?.user.login}`)
-
-            // replace {proposalLink} from response template with the link to the comment
-            .replaceAll('{proposalLink}', payload.comment?.html_url)
-
-            // remove any double quotes from the final comment because sometimes the assistant's
-            // response contains double quotes / sometimes it doesn't
-            .replaceAll('"', '');
+            // replace {user} from response template with GH @username
+            // @ts-ignore - replaceAll exists
+            .replaceAll('{user}', `@${payload.comment?.user.login}`);
 
         // Create a comment with the assistant's response
         console.log('ProposalPolice™ commenting on issue...');

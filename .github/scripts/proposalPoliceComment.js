@@ -105,9 +105,9 @@ function isCommentEditedEvent(payload) {
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, parsedAssistantResponse, _a, _b, action, _c, message, isNoAction, isActionEdit, isActionRequired, formattedResponse, formattedResponse;
-        var _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
-        return __generator(this, function (_x) {
-            switch (_x.label) {
+        var _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
+        return __generator(this, function (_y) {
+            switch (_y.label) {
                 case 0:
                     now = Date.now();
                     zonedDate = (0, date_fns_tz_1.utcToZonedTime)(now, 'UTC');
@@ -144,7 +144,7 @@ function run() {
                         : "I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH \"".concat(CONST_1.default.NO_ACTION, "\" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ").concat((_o = payload.changes.body) === null || _o === void 0 ? void 0 : _o.from, ".\n\nEdited comment content: ").concat((_p = payload.comment) === null || _p === void 0 ? void 0 : _p.body);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
                 case 1:
-                    assistantResponse = _x.sent();
+                    assistantResponse = _y.sent();
                     parsedAssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
                     console.log('parsedAssistantResponse: ', parsedAssistantResponse);
                     _a = parsedAssistantResponse !== null && parsedAssistantResponse !== void 0 ? parsedAssistantResponse : {}, _b = _a.action, action = _b === void 0 ? "" : _b, _c = _a.message, message = _c === void 0 ? "" : _c;
@@ -157,22 +157,19 @@ function run() {
                         return [2 /*return*/];
                     }
                     if (!(isCommentCreatedEvent(payload) && isActionRequired)) return [3 /*break*/, 3];
+                    console.log('payload.comment?.url', (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.url);
+                    console.log('payload.comment?.html_url', (_r = payload.comment) === null || _r === void 0 ? void 0 : _r.html_url);
                     formattedResponse = message
-                        // replace {user} from response template with @username
-                        // @ts-ignore - process is not imported
-                        .replaceAll('{user}', "@".concat((_q = payload.comment) === null || _q === void 0 ? void 0 : _q.user.login))
-                        // replace {proposalLink} from response template with the link to the comment
-                        .replaceAll('{proposalLink}', (_r = payload.comment) === null || _r === void 0 ? void 0 : _r.html_url)
-                        // remove any double quotes from the final comment because sometimes the assistant's
-                        // response contains double quotes / sometimes it doesn't
-                        .replaceAll('"', '');
+                        // replace {user} from response template with GH @username
+                        // @ts-ignore - replaceAll exists
+                        .replaceAll('{user}', "@".concat((_s = payload.comment) === null || _s === void 0 ? void 0 : _s.user.login));
                     // Create a comment with the assistant's response
                     console.log('ProposalPolice™ commenting on issue...');
                     return [4 /*yield*/, octokit.issues.createComment(__assign(__assign({}, github_1.context.repo), { 
                             /* eslint-disable @typescript-eslint/naming-convention */
-                            issue_number: (_t = (_s = payload.issue) === null || _s === void 0 ? void 0 : _s.number) !== null && _t !== void 0 ? _t : -1, body: formattedResponse }))];
+                            issue_number: (_u = (_t = payload.issue) === null || _t === void 0 ? void 0 : _t.number) !== null && _u !== void 0 ? _u : -1, body: formattedResponse }))];
                 case 2:
-                    _x.sent();
+                    _y.sent();
                     return [3 /*break*/, 5];
                 case 3:
                     if (!isActionEdit) return [3 /*break*/, 5];
@@ -180,10 +177,10 @@ function run() {
                     console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { 
                             /* eslint-disable @typescript-eslint/naming-convention */
-                            comment_id: (_v = (_u = payload.comment) === null || _u === void 0 ? void 0 : _u.id) !== null && _v !== void 0 ? _v : -1, body: "".concat(formattedResponse, "\n\n").concat((_w = payload.comment) === null || _w === void 0 ? void 0 : _w.body) }))];
+                            comment_id: (_w = (_v = payload.comment) === null || _v === void 0 ? void 0 : _v.id) !== null && _w !== void 0 ? _w : -1, body: "".concat(formattedResponse, "\n\n").concat((_x = payload.comment) === null || _x === void 0 ? void 0 : _x.body) }))];
                 case 4:
-                    _x.sent();
-                    _x.label = 5;
+                    _y.sent();
+                    _y.label = 5;
                 case 5: return [2 /*return*/];
             }
         });
