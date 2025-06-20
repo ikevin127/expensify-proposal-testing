@@ -186,6 +186,11 @@ async function run() {
 
         let isDuplicate = false;
         for (const previousProposal of previousProposals) {
+            const isNotAProposal = !previousProposal.body || !previousProposal.body.includes(CONST.PROPOSAL_KEYWORD)
+            const isAuthorBot = previousProposal.user?.login === CONST.LABELS.GITHUB_ACTIONS || previousProposal.user?.type === CONST.LABELS.BOT;
+            // Skip prompting if comment is empty / not a proposal / author is GH bot
+            if (isNotAProposal || isAuthorBot) continue;
+
             const duplicateCheckPrompt = ProposalPoliceTemplates.getPromptForNewProposalDuplicateCheck(previousProposal.body, newProposalBody);
             const duplicateCheckResponse = await OpenAIUtils.prompt(duplicateCheckPrompt);
             let similarityPercentage = 0;

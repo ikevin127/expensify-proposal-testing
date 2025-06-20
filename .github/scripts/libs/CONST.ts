@@ -1,6 +1,8 @@
 const CONST = {
     LABELS: {
         OPEN: 'open',
+        BOT: 'Bot',
+        GITHUB_ACTIONS: 'github-actions',
         HELP_WANTED: 'Help Wanted',
     },
     ACTIONS: {

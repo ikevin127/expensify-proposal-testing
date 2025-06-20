@@ -139,10 +139,10 @@ var ProposalPoliceTemplates = /** @class */ (function () {
 // Main function to process the workflow event
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, parsedAssistantResponse, _a, _b, action, _c, message, isNoAction, isActionEdit, isActionRequired, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, isDuplicate, _i, previousProposals_1, previousProposal, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _d, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, formattedResponse, formattedResponse;
-        var _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
-        return __generator(this, function (_0) {
-            switch (_0.label) {
+        var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, parsedAssistantResponse, _a, _b, action, _c, message, isNoAction, isActionEdit, isActionRequired, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, isDuplicate, _i, previousProposals_1, previousProposal, isNotAProposal, isAuthorBot, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _d, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, formattedResponse, formattedResponse;
+        var _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1;
+        return __generator(this, function (_2) {
+            switch (_2.label) {
                 case 0:
                     now = Date.now();
                     zonedDate = (0, date_fns_tz_1.utcToZonedTime)(now, 'UTC');
@@ -180,7 +180,7 @@ function run() {
                         : ProposalPoliceTemplates.getPromptForEditedProposal((_p = payload.changes.body) === null || _p === void 0 ? void 0 : _p.from, (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.body);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
                 case 1:
-                    assistantResponse = _0.sent();
+                    assistantResponse = _2.sent();
                     parsedAssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
                     console.log('parsedAssistantResponse: ', parsedAssistantResponse);
                     _a = parsedAssistantResponse !== null && parsedAssistantResponse !== void 0 ? parsedAssistantResponse : {}, _b = _a.action, action = _b === void 0 ? "" : _b, _c = _a.message, message = _c === void 0 ? "" : _c;
@@ -198,7 +198,7 @@ function run() {
                     console.log('Get comments for issue #', issueNumber);
                     return [4 /*yield*/, octokit.issues.listComments(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, per_page: 100 }))];
                 case 2:
-                    commentsResponse = _0.sent();
+                    commentsResponse = _2.sent();
                     console.log('commentsResponse', commentsResponse);
                     previousProposals = (_v = commentsResponse === null || commentsResponse === void 0 ? void 0 : commentsResponse.data) === null || _v === void 0 ? void 0 : _v.filter(function (comment) {
                         return new Date(comment.created_at).getTime() < newProposalCreatedAt_1 &&
@@ -207,14 +207,19 @@ function run() {
                     });
                     isDuplicate = false;
                     _i = 0, previousProposals_1 = previousProposals;
-                    _0.label = 3;
+                    _2.label = 3;
                 case 3:
                     if (!(_i < previousProposals_1.length)) return [3 /*break*/, 6];
                     previousProposal = previousProposals_1[_i];
+                    isNotAProposal = !previousProposal.body || !previousProposal.body.includes(CONST_1.default.PROPOSAL_KEYWORD);
+                    isAuthorBot = ((_w = previousProposal.user) === null || _w === void 0 ? void 0 : _w.login) === CONST_1.default.LABELS.GITHUB_ACTIONS || ((_x = previousProposal.user) === null || _x === void 0 ? void 0 : _x.type) === CONST_1.default.LABELS.BOT;
+                    // Skip prompting if comment is empty / not a proposal / author is GH bot
+                    if (isNotAProposal || isAuthorBot)
+                        return [3 /*break*/, 5];
                     duplicateCheckPrompt = ProposalPoliceTemplates.getPromptForNewProposalDuplicateCheck(previousProposal.body, newProposalBody);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(duplicateCheckPrompt)];
                 case 4:
-                    duplicateCheckResponse = _0.sent();
+                    duplicateCheckResponse = _2.sent();
                     similarityPercentage = 0;
                     try {
                         parsedDuplicateCheckResponse = JSON.parse(sanitizeJSONStringValues(duplicateCheckResponse));
@@ -230,7 +235,7 @@ function run() {
                         isDuplicate = true;
                         return [3 /*break*/, 6];
                     }
-                    _0.label = 5;
+                    _2.label = 5;
                 case 5:
                     _i++;
                     return [3 /*break*/, 3];
@@ -242,12 +247,12 @@ function run() {
                     console.log('ProposalPolice™ withdrawing duplicated proposal...');
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { comment_id: commentID, body: duplicateCheckWithdrawMessage }))];
                 case 7:
-                    _0.sent();
+                    _2.sent();
                     // Post a comment to notify the user about the withdrawn duplicated proposal
                     console.log('ProposalPolice™ notifying contributor of withdrawn proposal...');
                     return [4 /*yield*/, octokit.issues.createComment(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, body: duplicateCheckNoticeMessage }))];
                 case 8:
-                    _0.sent();
+                    _2.sent();
                     return [2 /*return*/];
                 case 9:
                     // If assistant response is NO_ACTION and there's no message, do nothing
@@ -256,26 +261,26 @@ function run() {
                         return [2 /*return*/];
                     }
                     if (!(isCommentCreatedEvent(payload) && isActionRequired)) return [3 /*break*/, 11];
-                    console.log('payload.comment?.url', (_w = payload.comment) === null || _w === void 0 ? void 0 : _w.url);
-                    console.log('payload.comment?.html_url', (_x = payload.comment) === null || _x === void 0 ? void 0 : _x.html_url);
+                    console.log('payload.comment?.url', (_y = payload.comment) === null || _y === void 0 ? void 0 : _y.url);
+                    console.log('payload.comment?.html_url', (_z = payload.comment) === null || _z === void 0 ? void 0 : _z.html_url);
                     formattedResponse = message
                         // replace {user} from response template with GH @username
                         // @ts-ignore - replaceAll exists
-                        .replaceAll('{user}', "@".concat((_y = payload.comment) === null || _y === void 0 ? void 0 : _y.user.login));
+                        .replaceAll('{user}', "@".concat((_0 = payload.comment) === null || _0 === void 0 ? void 0 : _0.user.login));
                     // Create a comment with the assistant's response
                     console.log('ProposalPolice™ commenting on issue...');
                     return [4 /*yield*/, octokit.issues.createComment(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, body: formattedResponse }))];
                 case 10:
-                    _0.sent();
+                    _2.sent();
                     return [3 /*break*/, 13];
                 case 11:
                     if (!isActionEdit) return [3 /*break*/, 13];
                     formattedResponse = message.replace('{updated_timestamp}', formattedDate);
                     console.log('ProposalPolice™ editing issue comment...', payload.comment.id);
-                    return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { comment_id: commentID, body: "".concat(formattedResponse, "\n\n").concat((_z = payload.comment) === null || _z === void 0 ? void 0 : _z.body) }))];
+                    return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { comment_id: commentID, body: "".concat(formattedResponse, "\n\n").concat((_1 = payload.comment) === null || _1 === void 0 ? void 0 : _1.body) }))];
                 case 12:
-                    _0.sent();
-                    _0.label = 13;
+                    _2.sent();
+                    _2.label = 13;
                 case 13: return [2 /*return*/];
             }
         });
