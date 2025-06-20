@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var CONST = {
     LABELS: {
+        OPEN: 'open',
         HELP_WANTED: 'Help Wanted',
     },
     ACTIONS: {

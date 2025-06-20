@@ -1,5 +1,6 @@
 const CONST = {
     LABELS: {
+        OPEN: 'open',
         HELP_WANTED: 'Help Wanted',
     },
     ACTIONS: {

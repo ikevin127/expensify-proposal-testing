@@ -116,19 +116,25 @@ function isCommentCreatedEvent(payload) {
 function isCommentEditedEvent(payload) {
     return payload.action === CONST_1.default.ACTIONS.EDITED;
 }
-var ProposalPolicePrompt = /** @class */ (function () {
-    function ProposalPolicePrompt() {
+var ProposalPoliceTemplates = /** @class */ (function () {
+    function ProposalPoliceTemplates() {
     }
-    ProposalPolicePrompt.getPromptForNewProposalTemplateCheck = function (commentBody) {
+    ProposalPoliceTemplates.getPromptForNewProposalTemplateCheck = function (commentBody) {
         return "I NEED HELP WITH CASE (1.), CHECK IF COMMENT IS PROPOSAL AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH \"".concat(CONST_1.default.NO_ACTION, "\" IN CASE THE COMMENT IS NOT A PROPOSAL. Comment content: ").concat(commentBody);
     };
-    ProposalPolicePrompt.getPromptForNewProposalDuplicateCheck = function (existingProposal, newProposalBody) {
+    ProposalPoliceTemplates.getPromptForNewProposalDuplicateCheck = function (existingProposal, newProposalBody) {
         return "I NEED HELP WITH CASE (3.), COMPARE THE FOLLOWING TWO PROPOSALS. ONLY CONSIDER THE FOLLOWING SECTIONS: (1) WHAT IS THE ROOT CAUSE OF THAT PROBLEM? (2) WHAT CHANGES DO YOU THINK WE SHOULD MAKE IN ORDER TO SOLVE THE PROBLEM? EXTRACT THESE SECTIONS FROM BOTH PROPOSALS AND RETURN A SIMILARITY PERCENTAGE (0-100) REPRESENTING HOW SIMILAR THESE TWO PROPOSALS ARE IN THOSE SECTIONS. \n\nProposal 1:\n".concat(existingProposal, "\n\nProposal 2:\n").concat(newProposalBody);
     };
-    ProposalPolicePrompt.getPromptForEditedProposal = function (previousBody, editedBody) {
+    ProposalPoliceTemplates.getPromptForEditedProposal = function (previousBody, editedBody) {
         return "I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH \"".concat(CONST_1.default.NO_ACTION, "\" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ").concat(previousBody, ".\n\nEdited comment content: ").concat(editedBody);
     };
-    return ProposalPolicePrompt;
+    ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage = function () {
+        return '#### 🚫 Duplicated proposal withdrawn by 🤖 ProposalPolice.';
+    };
+    ProposalPoliceTemplates.getDuplicateCheckNoticeMessage = function (proposalAuthor) {
+        return "\u26A0\uFE0F @".concat(proposalAuthor, " Your proposal is a duplicate of an already existing proposal and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.");
+    };
+    return ProposalPoliceTemplates;
 }());
 // Main function to process the workflow event
 function run() {
@@ -148,7 +154,8 @@ function run() {
                     }
                     payload = github_1.context.payload;
                     // check if the issue is open and the has labels
-                    if (((_e = payload.issue) === null || _e === void 0 ? void 0 : _e.state) !== 'open' && !((_f = payload.issue) === null || _f === void 0 ? void 0 : _f.labels.some(function (issueLabel) { return issueLabel.name === CONST_1.default.LABELS.HELP_WANTED; }))) {
+                    if (((_e = payload.issue) === null || _e === void 0 ? void 0 : _e.state) === CONST_1.default.LABELS.OPEN && !((_f = payload.issue) === null || _f === void 0 ? void 0 : _f.labels.some(function (issueLabel) { return issueLabel.name === CONST_1.default.LABELS.HELP_WANTED; }))) {
+                        console.log('Issue is not open or does not have the "Help Wanted" label, skipping checks.');
                         return [2 /*return*/];
                     }
                     // Verify that the comment is not empty and contains the case sensitive `Proposal` keyword
@@ -169,8 +176,8 @@ function run() {
                         return [2 /*return*/];
                     }
                     prompt = isCommentCreatedEvent(payload)
-                        ? ProposalPolicePrompt.getPromptForNewProposalTemplateCheck((_o = payload.comment) === null || _o === void 0 ? void 0 : _o.body)
-                        : ProposalPolicePrompt.getPromptForEditedProposal((_p = payload.changes.body) === null || _p === void 0 ? void 0 : _p.from, (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.body);
+                        ? ProposalPoliceTemplates.getPromptForNewProposalTemplateCheck((_o = payload.comment) === null || _o === void 0 ? void 0 : _o.body)
+                        : ProposalPoliceTemplates.getPromptForEditedProposal((_p = payload.changes.body) === null || _p === void 0 ? void 0 : _p.from, (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.body);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
                 case 1:
                     assistantResponse = _0.sent();
@@ -183,12 +190,12 @@ function run() {
                     issueNumber = (_s = (_r = payload.issue) === null || _r === void 0 ? void 0 : _r.number) !== null && _s !== void 0 ? _s : -1;
                     commentID = (_u = (_t = payload.comment) === null || _t === void 0 ? void 0 : _t.id) !== null && _u !== void 0 ? _u : -1;
                     if (!isCommentCreatedEvent(payload)) return [3 /*break*/, 9];
-                    console.log('DUPLICATE PROPOSAL DETECTION Check Initialized');
+                    console.log('Running DUPLICATE PROPOSAL DETECTION Check');
                     newProposalCreatedAt_1 = new Date(payload.comment.created_at).getTime();
                     newProposalBody = payload.comment.body;
                     newProposalAuthor = payload.comment.user.login;
                     // Fetch all comments in the issue
-                    console.log('Get issue comments payload for issue #', issueNumber);
+                    console.log('Get comments for issue #', issueNumber);
                     return [4 /*yield*/, octokit.issues.listComments(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, per_page: 100 }))];
                 case 2:
                     commentsResponse = _0.sent();
@@ -204,7 +211,7 @@ function run() {
                 case 3:
                     if (!(_i < previousProposals_1.length)) return [3 /*break*/, 6];
                     previousProposal = previousProposals_1[_i];
-                    duplicateCheckPrompt = ProposalPolicePrompt.getPromptForNewProposalDuplicateCheck(previousProposal.body, newProposalBody);
+                    duplicateCheckPrompt = ProposalPoliceTemplates.getPromptForNewProposalDuplicateCheck(previousProposal.body, newProposalBody);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(duplicateCheckPrompt)];
                 case 4:
                     duplicateCheckResponse = _0.sent();
@@ -219,7 +226,7 @@ function run() {
                         console.error('Failed to parse AI similarity response:', duplicateCheckResponse);
                     }
                     if (similarityPercentage >= 90) {
-                        console.log("Found duplicate with %".concat(similarityPercentage, " similarity."));
+                        console.log("Found duplicate with ".concat(similarityPercentage, "% similarity."));
                         isDuplicate = true;
                         return [3 /*break*/, 6];
                     }
@@ -229,8 +236,8 @@ function run() {
                     return [3 /*break*/, 3];
                 case 6:
                     if (!isDuplicate) return [3 /*break*/, 9];
-                    duplicateCheckWithdrawMessage = '#### 🚫 Duplicated proposal withdrawn by ProposalPolice.';
-                    duplicateCheckNoticeMessage = "\uD83D\uDEAB {user} Your proposal is a duplicate of an already existing proposal and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.".replace('{user}', "@".concat(newProposalAuthor));
+                    duplicateCheckWithdrawMessage = ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage();
+                    duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor);
                     // If a duplicate proposal is detected, update the comment to withdraw it
                     console.log('ProposalPolice™ withdrawing duplicated proposal...');
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { comment_id: commentID, body: duplicateCheckWithdrawMessage }))];
