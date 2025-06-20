@@ -139,7 +139,7 @@ var ProposalPoliceTemplates = /** @class */ (function () {
 // Main function to process the workflow event
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var now, zonedDate, formattedDate, octokit, payload, prompt, assistantResponse, parsedAssistantResponse, _a, _b, action, _c, message, isNoAction, isActionEdit, isActionRequired, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, isDuplicate, _i, previousProposals_1, previousProposal, isNotAProposal, isAuthorBot, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _d, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, formattedResponse, formattedResponse;
+        var now, zonedDate, formattedDate, octokit, payload, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, didFindDuplicate, _i, previousProposals_1, previousProposal, isNotAProposal, isAuthorBot, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _a, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, prompt, assistantResponse, parsedAssistantResponse, _b, _c, action, _d, message, isNoAction, isActionEdit, isActionRequired, formattedResponse, formattedResponse;
         var _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1;
         return __generator(this, function (_2) {
             switch (_2.label) {
@@ -175,21 +175,9 @@ function run() {
                         (0, core_1.setFailed)(new Error("Unsupported action type ".concat(payload === null || payload === void 0 ? void 0 : payload.action)));
                         return [2 /*return*/];
                     }
-                    prompt = isCommentCreatedEvent(payload)
-                        ? ProposalPoliceTemplates.getPromptForNewProposalTemplateCheck((_o = payload.comment) === null || _o === void 0 ? void 0 : _o.body)
-                        : ProposalPoliceTemplates.getPromptForEditedProposal((_p = payload.changes.body) === null || _p === void 0 ? void 0 : _p.from, (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.body);
-                    return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
-                case 1:
-                    assistantResponse = _2.sent();
-                    parsedAssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
-                    console.log('parsedAssistantResponse: ', parsedAssistantResponse);
-                    _a = parsedAssistantResponse !== null && parsedAssistantResponse !== void 0 ? parsedAssistantResponse : {}, _b = _a.action, action = _b === void 0 ? "" : _b, _c = _a.message, message = _c === void 0 ? "" : _c;
-                    isNoAction = action.trim() === CONST_1.default.NO_ACTION;
-                    isActionEdit = action.trim() === CONST_1.default.ACTION_EDIT;
-                    isActionRequired = action.trim() === CONST_1.default.ACTION_REQUIRED;
-                    issueNumber = (_s = (_r = payload.issue) === null || _r === void 0 ? void 0 : _r.number) !== null && _s !== void 0 ? _s : -1;
-                    commentID = (_u = (_t = payload.comment) === null || _t === void 0 ? void 0 : _t.id) !== null && _u !== void 0 ? _u : -1;
-                    if (!isCommentCreatedEvent(payload)) return [3 /*break*/, 9];
+                    issueNumber = (_p = (_o = payload.issue) === null || _o === void 0 ? void 0 : _o.number) !== null && _p !== void 0 ? _p : -1;
+                    commentID = (_r = (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.id) !== null && _r !== void 0 ? _r : -1;
+                    if (!isCommentCreatedEvent(payload)) return [3 /*break*/, 8];
                     console.log('Running DUPLICATE PROPOSAL DETECTION Check');
                     newProposalCreatedAt_1 = new Date(payload.comment.created_at).getTime();
                     newProposalBody = payload.comment.body;
@@ -197,34 +185,34 @@ function run() {
                     // Fetch all comments in the issue
                     console.log('Get comments for issue #', issueNumber);
                     return [4 /*yield*/, octokit.issues.listComments(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, per_page: 100 }))];
-                case 2:
+                case 1:
                     commentsResponse = _2.sent();
                     console.log('commentsResponse', commentsResponse);
-                    previousProposals = (_v = commentsResponse === null || commentsResponse === void 0 ? void 0 : commentsResponse.data) === null || _v === void 0 ? void 0 : _v.filter(function (comment) {
+                    previousProposals = (_s = commentsResponse === null || commentsResponse === void 0 ? void 0 : commentsResponse.data) === null || _s === void 0 ? void 0 : _s.filter(function (comment) {
                         return new Date(comment.created_at).getTime() < newProposalCreatedAt_1 &&
                             comment.body &&
                             comment.body.includes(CONST_1.default.PROPOSAL_KEYWORD);
                     });
-                    isDuplicate = false;
+                    didFindDuplicate = false;
                     _i = 0, previousProposals_1 = previousProposals;
-                    _2.label = 3;
-                case 3:
-                    if (!(_i < previousProposals_1.length)) return [3 /*break*/, 6];
+                    _2.label = 2;
+                case 2:
+                    if (!(_i < previousProposals_1.length)) return [3 /*break*/, 5];
                     previousProposal = previousProposals_1[_i];
                     isNotAProposal = !previousProposal.body || !previousProposal.body.includes(CONST_1.default.PROPOSAL_KEYWORD);
-                    isAuthorBot = ((_w = previousProposal.user) === null || _w === void 0 ? void 0 : _w.login) === CONST_1.default.LABELS.GITHUB_ACTIONS || ((_x = previousProposal.user) === null || _x === void 0 ? void 0 : _x.type) === CONST_1.default.LABELS.BOT;
+                    isAuthorBot = ((_t = previousProposal.user) === null || _t === void 0 ? void 0 : _t.login) === CONST_1.default.LABELS.GITHUB_ACTIONS || ((_u = previousProposal.user) === null || _u === void 0 ? void 0 : _u.type) === CONST_1.default.LABELS.BOT;
                     // Skip prompting if comment is empty / not a proposal / author is GH bot
                     if (isNotAProposal || isAuthorBot)
-                        return [3 /*break*/, 5];
+                        return [3 /*break*/, 4];
                     duplicateCheckPrompt = ProposalPoliceTemplates.getPromptForNewProposalDuplicateCheck(previousProposal.body, newProposalBody);
                     return [4 /*yield*/, OpenAIUtils_1.default.prompt(duplicateCheckPrompt)];
-                case 4:
+                case 3:
                     duplicateCheckResponse = _2.sent();
                     similarityPercentage = 0;
                     try {
                         parsedDuplicateCheckResponse = JSON.parse(sanitizeJSONStringValues(duplicateCheckResponse));
                         console.log('parsedDuplicateCheckResponse: ', parsedDuplicateCheckResponse);
-                        _d = (parsedDuplicateCheckResponse !== null && parsedDuplicateCheckResponse !== void 0 ? parsedDuplicateCheckResponse : {}).similarity, similarity = _d === void 0 ? 0 : _d;
+                        _a = (parsedDuplicateCheckResponse !== null && parsedDuplicateCheckResponse !== void 0 ? parsedDuplicateCheckResponse : {}).similarity, similarity = _a === void 0 ? 0 : _a;
                         similarityPercentage = transformToNumber(similarity);
                     }
                     catch (e) {
@@ -232,30 +220,42 @@ function run() {
                     }
                     if (similarityPercentage >= 90) {
                         console.log("Found duplicate with ".concat(similarityPercentage, "% similarity."));
-                        isDuplicate = true;
-                        return [3 /*break*/, 6];
+                        didFindDuplicate = true;
+                        return [3 /*break*/, 5];
                     }
-                    _2.label = 5;
-                case 5:
+                    _2.label = 4;
+                case 4:
                     _i++;
-                    return [3 /*break*/, 3];
-                case 6:
-                    if (!isDuplicate) return [3 /*break*/, 9];
+                    return [3 /*break*/, 2];
+                case 5:
+                    if (!didFindDuplicate) return [3 /*break*/, 8];
                     duplicateCheckWithdrawMessage = ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage();
                     duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor);
                     // If a duplicate proposal is detected, update the comment to withdraw it
                     console.log('ProposalPolice™ withdrawing duplicated proposal...');
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { comment_id: commentID, body: duplicateCheckWithdrawMessage }))];
-                case 7:
+                case 6:
                     _2.sent();
                     // Post a comment to notify the user about the withdrawn duplicated proposal
                     console.log('ProposalPolice™ notifying contributor of withdrawn proposal...');
                     return [4 /*yield*/, octokit.issues.createComment(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, body: duplicateCheckNoticeMessage }))];
-                case 8:
+                case 7:
                     _2.sent();
                     return [2 /*return*/];
+                case 8:
+                    prompt = isCommentCreatedEvent(payload)
+                        ? ProposalPoliceTemplates.getPromptForNewProposalTemplateCheck((_v = payload.comment) === null || _v === void 0 ? void 0 : _v.body)
+                        : ProposalPoliceTemplates.getPromptForEditedProposal((_w = payload.changes.body) === null || _w === void 0 ? void 0 : _w.from, (_x = payload.comment) === null || _x === void 0 ? void 0 : _x.body);
+                    return [4 /*yield*/, OpenAIUtils_1.default.prompt(prompt)];
                 case 9:
-                    // If assistant response is NO_ACTION and there's no message, do nothing
+                    assistantResponse = _2.sent();
+                    parsedAssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
+                    console.log('parsedAssistantResponse: ', parsedAssistantResponse);
+                    _b = parsedAssistantResponse !== null && parsedAssistantResponse !== void 0 ? parsedAssistantResponse : {}, _c = _b.action, action = _c === void 0 ? "" : _c, _d = _b.message, message = _d === void 0 ? "" : _d;
+                    isNoAction = action.trim() === CONST_1.default.NO_ACTION;
+                    isActionEdit = action.trim() === CONST_1.default.ACTION_EDIT;
+                    isActionRequired = action.trim() === CONST_1.default.ACTION_REQUIRED;
+                    // If assistant response is NO_ACTION and there's no message, return early
                     if (isNoAction && !message) {
                         console.log('Detected NO_ACTION for comment, returning early.');
                         return [2 /*return*/];

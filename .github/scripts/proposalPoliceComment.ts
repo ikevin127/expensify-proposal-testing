@@ -146,20 +146,6 @@ async function run() {
         return;
     }
 
-    const prompt = isCommentCreatedEvent(payload)
-        ? ProposalPoliceTemplates.getPromptForNewProposalTemplateCheck(payload.comment?.body) 
-        : ProposalPoliceTemplates.getPromptForEditedProposal(payload.changes.body?.from, payload.comment?.body);
-
-    const assistantResponse = await OpenAIUtils.prompt(prompt);
-    const parsedAssistantResponse: AssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
-    console.log('parsedAssistantResponse: ', parsedAssistantResponse);
-
-    // fallback to empty strings to avoid crashing in case parsing fails and we fallback to empty object
-    const {action = "", message = ""} = parsedAssistantResponse ?? {};
-    const isNoAction = action.trim() === CONST.NO_ACTION;
-    const isActionEdit = action.trim() === CONST.ACTION_EDIT;
-    const isActionRequired = action.trim() === CONST.ACTION_REQUIRED;
-
     const issueNumber = payload.issue?.number ?? -1;
     const commentID = payload.comment?.id ?? -1;
 
@@ -184,7 +170,7 @@ async function run() {
             comment.body.includes(CONST.PROPOSAL_KEYWORD)
         );
 
-        let isDuplicate = false;
+        let didFindDuplicate = false;
         for (const previousProposal of previousProposals) {
             const isNotAProposal = !previousProposal.body || !previousProposal.body.includes(CONST.PROPOSAL_KEYWORD)
             const isAuthorBot = previousProposal.user?.login === CONST.LABELS.GITHUB_ACTIONS || previousProposal.user?.type === CONST.LABELS.BOT;
@@ -205,12 +191,12 @@ async function run() {
 
             if (similarityPercentage >= 90) {
                 console.log(`Found duplicate with ${similarityPercentage}% similarity.`);
-                isDuplicate = true;
+                didFindDuplicate = true;
                 break;
             }
         }
 
-        if (isDuplicate) {
+        if (didFindDuplicate) {
             const duplicateCheckWithdrawMessage = ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage();
             const duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor);
             // If a duplicate proposal is detected, update the comment to withdraw it
@@ -231,7 +217,21 @@ async function run() {
         }
     }
 
-    // If assistant response is NO_ACTION and there's no message, do nothing
+    const prompt = isCommentCreatedEvent(payload)
+        ? ProposalPoliceTemplates.getPromptForNewProposalTemplateCheck(payload.comment?.body) 
+        : ProposalPoliceTemplates.getPromptForEditedProposal(payload.changes.body?.from, payload.comment?.body);
+
+    const assistantResponse = await OpenAIUtils.prompt(prompt);
+    const parsedAssistantResponse: AssistantResponse = JSON.parse(sanitizeJSONStringValues(assistantResponse));
+    console.log('parsedAssistantResponse: ', parsedAssistantResponse);
+
+    // fallback to empty strings to avoid crashing in case parsing fails
+    const {action = "", message = ""} = parsedAssistantResponse ?? {};
+    const isNoAction = action.trim() === CONST.NO_ACTION;
+    const isActionEdit = action.trim() === CONST.ACTION_EDIT;
+    const isActionRequired = action.trim() === CONST.ACTION_REQUIRED;
+
+    // If assistant response is NO_ACTION and there's no message, return early
     if (isNoAction && !message) {
         console.log('Detected NO_ACTION for comment, returning early.');
         return;
