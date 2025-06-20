@@ -87,7 +87,7 @@ class ProposalPoliceTemplates {
     }
 
     static getPromptForNewProposalDuplicateCheck(existingProposal?: string, newProposalBody?: string): string {
-        return `I NEED HELP WITH CASE (3.), COMPARE THE FOLLOWING TWO PROPOSALS. ONLY CONSIDER THE FOLLOWING SECTIONS: (1) WHAT IS THE ROOT CAUSE OF THAT PROBLEM? (2) WHAT CHANGES DO YOU THINK WE SHOULD MAKE IN ORDER TO SOLVE THE PROBLEM? EXTRACT THESE SECTIONS FROM BOTH PROPOSALS AND RETURN A SIMILARITY PERCENTAGE (0-100) REPRESENTING HOW SIMILAR THESE TWO PROPOSALS ARE IN THOSE SECTIONS. \n\nProposal 1:\n${existingProposal}\n\nProposal 2:\n${newProposalBody}`;
+        return `I NEED HELP WITH CASE (3.) [INSTRUCTIONS SECTION: IX. DUPLICATE PROPOSAL DETECTION], COMPARE THE FOLLOWING TWO PROPOSALS AND RETURN A SIMILARITY PERCENTAGE (0-100) REPRESENTING HOW SIMILAR THESE TWO PROPOSALS ARE IN THOSE SECTIONS AS PER THE INSTRUCTIONS. \n\nProposal 1:\n${existingProposal}\n\nProposal 2:\n${newProposalBody}`;
     }
 
     static getPromptForEditedProposal(previousBody?: string, editedBody?: string): string {
