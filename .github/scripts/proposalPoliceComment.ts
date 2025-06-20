@@ -151,7 +151,7 @@ async function run() {
 
     // DUPLICATE PROPOSAL DETECTION
     if (isCommentCreatedEvent(payload)) {
-        console.log('Running DUPLICATE PROPOSAL DETECTION Check');
+        console.log('Starting DUPLICATE PROPOSAL DETECTION Check');
         const newProposalCreatedAt = new Date(payload.comment.created_at).getTime();
         const newProposalBody = payload.comment.body;
         const newProposalAuthor = payload.comment.user.login;
@@ -213,6 +213,7 @@ async function run() {
                 issue_number: issueNumber,
                 body: duplicateCheckNoticeMessage,
             });
+            console.log('DUPLICATE PROPOSAL DETECTION Check Completed, returning early.');
             return;
         }
     }

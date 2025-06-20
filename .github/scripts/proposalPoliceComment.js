@@ -178,7 +178,7 @@ function run() {
                     issueNumber = (_p = (_o = payload.issue) === null || _o === void 0 ? void 0 : _o.number) !== null && _p !== void 0 ? _p : -1;
                     commentID = (_r = (_q = payload.comment) === null || _q === void 0 ? void 0 : _q.id) !== null && _r !== void 0 ? _r : -1;
                     if (!isCommentCreatedEvent(payload)) return [3 /*break*/, 8];
-                    console.log('Running DUPLICATE PROPOSAL DETECTION Check');
+                    console.log('Starting DUPLICATE PROPOSAL DETECTION Check');
                     newProposalCreatedAt_1 = new Date(payload.comment.created_at).getTime();
                     newProposalBody = payload.comment.body;
                     newProposalAuthor = payload.comment.user.login;
@@ -241,6 +241,7 @@ function run() {
                     return [4 /*yield*/, octokit.issues.createComment(__assign(__assign({}, github_1.context.repo), { issue_number: issueNumber, body: duplicateCheckNoticeMessage }))];
                 case 7:
                     _2.sent();
+                    console.log('DUPLICATE PROPOSAL DETECTION Check Completed, returning early.');
                     return [2 /*return*/];
                 case 8:
                     prompt = isCommentCreatedEvent(payload)
