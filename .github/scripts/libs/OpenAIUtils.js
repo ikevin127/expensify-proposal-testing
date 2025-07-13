@@ -94,12 +94,12 @@ var OpenAIUtils = /** @class */ (function () {
                         threadRun = _g.sent();
                         if (!(threadRun.status !== CONST_1.default.OPENAI_THREAD_COMPLETED)) return [3 /*break*/, 5];
                         count++;
-                        // @ts-ignore - Promise is not a type
+                        // @ts-ignore - Promise exists
                         return [4 /*yield*/, new Promise(function (resolve) {
                                 setTimeout(resolve, CONST_1.default.OPENAI_POLL_RATE);
                             })];
                     case 4:
-                        // @ts-ignore - Promise is not a type
+                        // @ts-ignore - Promise exists
                         _g.sent();
                         return [3 /*break*/, 2];
                     case 5:

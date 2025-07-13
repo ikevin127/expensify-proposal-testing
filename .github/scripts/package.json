@@ -14,7 +14,7 @@
         "typescript": "^5.5.2"
     },
     "scripts": {
-        "build": "tsc proposalPoliceComment.ts --noEmitOnError false --skipLibCheck"
+        "build": "tsc proposalPoliceComment.ts --lib ES2017,DOM --noEmitOnError false --skipLibCheck"
     },
     "license": "MIT"
 }
