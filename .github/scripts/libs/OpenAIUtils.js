@@ -71,83 +71,85 @@ var OpenAIUtils = /** @class */ (function () {
     });
     OpenAIUtils.prompt = function (userMessage) {
         return __awaiter(this, void 0, void 0, function () {
-            var threadRun, response, count, _a, _b, _c, message, e_1_1;
+            var thread, run, response, count, _a, _b, _c, message, e_1_1;
             var _this = this;
             var _d, e_1, _e, _f;
             return __generator(this, function (_g) {
                 switch (_g.label) {
-                    case 0: return [4 /*yield*/, this.openAI.beta.threads.createAndRun({
-                            /* eslint-disable @typescript-eslint/naming-convention */
-                            assistant_id: this.assistantID,
-                            thread: { messages: [{ role: CONST_1.default.OPENAI_ROLES.USER, content: userMessage }] },
+                    case 0: return [4 /*yield*/, this.openAI.beta.threads.create({
+                            messages: [{ role: CONST_1.default.OPENAI_ROLES.USER, content: userMessage }],
                         })];
                     case 1:
-                        threadRun = _g.sent();
+                        thread = _g.sent();
+                        return [4 /*yield*/, this.openAI.beta.threads.runs.create(thread.id, {
+                                // eslint-disable-next-line @typescript-eslint/naming-convention
+                                assistant_id: this.assistantID,
+                            })];
+                    case 2:
+                        run = _g.sent();
                         response = '';
                         count = 0;
-                        _g.label = 2;
-                    case 2:
-                        if (!(!response && count < MAX_POLL_COUNT)) return [3 /*break*/, 17];
-                        return [4 /*yield*/, this.openAI.beta.threads.runs.retrieve(threadRun.thread_id, { thread_id: threadRun.id })];
+                        _g.label = 3;
                     case 3:
-                        // await thread run completion
-                        threadRun = _g.sent();
-                        if (!(threadRun.status !== CONST_1.default.OPENAI_THREAD_COMPLETED)) return [3 /*break*/, 5];
+                        if (!(!response && count < MAX_POLL_COUNT)) return [3 /*break*/, 18];
+                        return [4 /*yield*/, this.openAI.beta.threads.runs.retrieve(run.id, { thread_id: thread.id })];
+                    case 4:
+                        // eslint-disable-next-line @typescript-eslint/naming-convention
+                        run = _g.sent();
+                        if (!(run.status !== CONST_1.default.OPENAI_THREAD_COMPLETED)) return [3 /*break*/, 6];
                         count++;
-                        // @ts-ignore - Promise exists
                         return [4 /*yield*/, new Promise(function (resolve) {
                                 setTimeout(resolve, CONST_1.default.OPENAI_POLL_RATE);
                             })];
-                    case 4:
-                        // @ts-ignore - Promise exists
-                        _g.sent();
-                        return [3 /*break*/, 2];
                     case 5:
-                        _g.trys.push([5, 10, 11, 16]);
-                        _a = true, _b = (e_1 = void 0, __asyncValues(this.openAI.beta.threads.messages.list(threadRun.thread_id)));
-                        _g.label = 6;
-                    case 6: return [4 /*yield*/, _b.next()];
-                    case 7:
-                        if (!(_c = _g.sent(), _d = _c.done, !_d)) return [3 /*break*/, 9];
+                        _g.sent();
+                        return [3 /*break*/, 3];
+                    case 6:
+                        _g.trys.push([6, 11, 12, 17]);
+                        _a = true, _b = (e_1 = void 0, __asyncValues(this.openAI.beta.threads.messages.list(thread.id)));
+                        _g.label = 7;
+                    case 7: return [4 /*yield*/, _b.next()];
+                    case 8:
+                        if (!(_c = _g.sent(), _d = _c.done, !_d)) return [3 /*break*/, 10];
                         _f = _c.value;
                         _a = false;
                         message = _f;
                         if (message.role !== CONST_1.default.OPENAI_ROLES.ASSISTANT) {
-                            return [3 /*break*/, 8];
+                            return [3 /*break*/, 9];
                         }
-                        console.log('message.content:', message.content);
+                        ;
                         response += message.content
                             .map(function (contentBlock) { return _this.isTextContentBlock(contentBlock) && contentBlock.text.value; })
                             .join('\n')
                             .trim();
                         console.log('Parsed assistant response:', response);
-                        _g.label = 8;
-                    case 8:
+                        _g.label = 9;
+                    case 9:
                         _a = true;
-                        return [3 /*break*/, 6];
-                    case 9: return [3 /*break*/, 16];
-                    case 10:
+                        return [3 /*break*/, 7];
+                    case 10: return [3 /*break*/, 17];
+                    case 11:
                         e_1_1 = _g.sent();
                         e_1 = { error: e_1_1 };
-                        return [3 /*break*/, 16];
-                    case 11:
-                        _g.trys.push([11, , 14, 15]);
-                        if (!(!_a && !_d && (_e = _b.return))) return [3 /*break*/, 13];
-                        return [4 /*yield*/, _e.call(_b)];
+                        return [3 /*break*/, 17];
                     case 12:
+                        _g.trys.push([12, , 15, 16]);
+                        if (!(!_a && !_d && (_e = _b.return))) return [3 /*break*/, 14];
+                        return [4 /*yield*/, _e.call(_b)];
+                    case 13:
                         _g.sent();
-                        _g.label = 13;
-                    case 13: return [3 /*break*/, 15];
-                    case 14:
+                        _g.label = 14;
+                    case 14: return [3 /*break*/, 16];
+                    case 15:
                         if (e_1) throw e_1.error;
                         return [7 /*endfinally*/];
-                    case 15: return [7 /*endfinally*/];
-                    case 16:
+                    case 16: return [7 /*endfinally*/];
+                    case 17:
                         if (!response) {
                             throw new Error('Assistant response is empty or had no text content. This is unexpected.');
                         }
-                        return [3 /*break*/, 2];
-                    case 17: return [2 /*return*/, response];
+                        return [3 /*break*/, 3];
+                    case 18: return [2 /*return*/, response];
                 }
             });
         });

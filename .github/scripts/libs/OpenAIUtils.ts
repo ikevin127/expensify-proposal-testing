@@ -33,41 +33,42 @@ class OpenAIUtils {
     }
 
     static async prompt(userMessage: string) {
-        // start a thread run
-        let threadRun = await this.openAI.beta.threads.createAndRun({
-            /* eslint-disable @typescript-eslint/naming-convention */
-            assistant_id: this.assistantID,
-            thread: {messages: [{role: CONST.OPENAI_ROLES.USER, content: userMessage}]},
+        // 1. Create a thread
+        const thread = await this.openAI.beta.threads.create({
+            messages: [{role: CONST.OPENAI_ROLES.USER, content: userMessage}],
         });
 
-        // poll for run completion
+        // 2. Create a run on the thread
+        let run = await this.openAI.beta.threads.runs.create(thread.id, {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            assistant_id: this.assistantID,
+        });
+
+        // 3. Poll for completion
         let response = '';
         let count = 0;
         while (!response && count < MAX_POLL_COUNT) {
-            // await thread run completion
-            threadRun = await this.openAI.beta.threads.runs.retrieve(threadRun.thread_id, {thread_id: threadRun.id});
-            if (threadRun.status !== CONST.OPENAI_THREAD_COMPLETED) {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            run = await this.openAI.beta.threads.runs.retrieve(run.id, {thread_id: thread.id});
+            if (run.status !== CONST.OPENAI_THREAD_COMPLETED) {
                 count++;
-                // @ts-ignore - Promise exists
                 await new Promise((resolve) => {
                     setTimeout(resolve, CONST.OPENAI_POLL_RATE);
                 });
                 continue;
             }
 
-            // @ts-ignore - list does return array
-            for await (const message of this.openAI.beta.threads.messages.list(threadRun.thread_id)) {
+            // @ts-ignore - list is array type
+            for await (const message of this.openAI.beta.threads.messages.list(thread.id)) {
                 if (message.role !== CONST.OPENAI_ROLES.ASSISTANT) {
                     continue;
-                }
-                console.log('message.content:', message.content);
+                };
                 response += message.content
                     .map((contentBlock) => this.isTextContentBlock(contentBlock) && contentBlock.text.value)
                     .join('\n')
                     .trim();
                 console.log('Parsed assistant response:', response);
             }
-
             if (!response) {
                 throw new Error('Assistant response is empty or had no text content. This is unexpected.');
             }
