@@ -45,6 +45,10 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var CONST_1 = require("./CONST");
 var openai_1 = require("openai");
+var node_fetch_1 = require("node-fetch");
+if (!globalThis.fetch) {
+    globalThis.fetch = node_fetch_1.default;
+}
 var MAX_POLL_COUNT = Math.floor(CONST_1.default.OPENAI_POLL_TIMEOUT / CONST_1.default.OPENAI_POLL_RATE);
 var OpenAIUtils = /** @class */ (function () {
     function OpenAIUtils() {
