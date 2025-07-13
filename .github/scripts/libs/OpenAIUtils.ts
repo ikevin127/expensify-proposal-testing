@@ -1,6 +1,6 @@
 import CONST from './CONST';
 import OpenAI from 'openai';
-import fetch from 'node-fetch';
+import fetch, { Headers } from 'node-fetch';
 import type {Octokit} from '@octokit/core';
 // @ts-ignore
 import type {PaginateInterface} from '@octokit/plugin-paginate-rest';
@@ -10,6 +10,7 @@ import type {RestEndpointMethods} from '@octokit/plugin-rest-endpoint-methods/di
 
 if (!globalThis.fetch) {
     globalThis.fetch = fetch as any;
+    globalThis.Headers = Headers as any;
 }
 
 const MAX_POLL_COUNT = Math.floor(CONST.OPENAI_POLL_TIMEOUT / CONST.OPENAI_POLL_RATE);
