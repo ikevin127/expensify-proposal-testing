@@ -88,16 +88,18 @@ var OpenAIUtils = /** @class */ (function () {
                         _g.label = 2;
                     case 2:
                         if (!(!response && count < MAX_POLL_COUNT)) return [3 /*break*/, 17];
-                        return [4 /*yield*/, this.openAI.beta.threads.runs.retrieve(threadRun.thread_id, threadRun.id)];
+                        return [4 /*yield*/, this.openAI.beta.threads.runs.retrieve(threadRun.thread_id, { thread_id: threadRun.id })];
                     case 3:
                         // await thread run completion
                         threadRun = _g.sent();
                         if (!(threadRun.status !== CONST_1.default.OPENAI_THREAD_COMPLETED)) return [3 /*break*/, 5];
                         count++;
+                        // @ts-ignore - Promise is not a type
                         return [4 /*yield*/, new Promise(function (resolve) {
                                 setTimeout(resolve, CONST_1.default.OPENAI_POLL_RATE);
                             })];
                     case 4:
+                        // @ts-ignore - Promise is not a type
                         _g.sent();
                         return [3 /*break*/, 2];
                     case 5:

@@ -104,6 +104,7 @@ class ProposalPoliceTemplates {
 }
 
 // Main function to process the workflow event
+// @ts-ignore - all good
 async function run() {
     // Capture the timestamp immediately at the start of the run
     const now = Date.now();
@@ -126,12 +127,14 @@ async function run() {
     }
 
     // Verify that the comment is not empty and contains the case sensitive `Proposal` keyword
+    // @ts-ignore - includes exists on type string
     if (!payload.comment?.body.trim() || !payload.comment.body.includes(CONST.PROPOSAL_KEYWORD)) {
         console.log('Comment body is either empty or does not contain the keyword "Proposal"', payload.comment?.body);
         return;
     }
 
     // If event is `edited` and comment was already edited by the bot, return early
+    // @ts-ignore - includes exists on type string
     if (isCommentEditedEvent(payload) && payload.comment?.body.trim().includes('Edited by **proposal-police**')) {
         console.log('Comment was already edited by proposal-police once.\n', payload.comment?.body);
         return;

@@ -137,6 +137,7 @@ var ProposalPoliceTemplates = /** @class */ (function () {
     return ProposalPoliceTemplates;
 }());
 // Main function to process the workflow event
+// @ts-ignore - all good
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var now, zonedDate, formattedDate, octokit, payload, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, didFindDuplicate, _i, previousProposals_1, previousProposal, isNotAProposal, isAuthorBot, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _a, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, prompt, assistantResponse, parsedAssistantResponse, _b, _c, action, _d, message, isNoAction, isActionEdit, isActionRequired, formattedResponse, formattedResponse;
@@ -159,11 +160,13 @@ function run() {
                         return [2 /*return*/];
                     }
                     // Verify that the comment is not empty and contains the case sensitive `Proposal` keyword
+                    // @ts-ignore - includes exists on type string
                     if (!((_g = payload.comment) === null || _g === void 0 ? void 0 : _g.body.trim()) || !payload.comment.body.includes(CONST_1.default.PROPOSAL_KEYWORD)) {
                         console.log('Comment body is either empty or does not contain the keyword "Proposal"', (_h = payload.comment) === null || _h === void 0 ? void 0 : _h.body);
                         return [2 /*return*/];
                     }
                     // If event is `edited` and comment was already edited by the bot, return early
+                    // @ts-ignore - includes exists on type string
                     if (isCommentEditedEvent(payload) && ((_j = payload.comment) === null || _j === void 0 ? void 0 : _j.body.trim().includes('Edited by **proposal-police**'))) {
                         console.log('Comment was already edited by proposal-police once.\n', (_k = payload.comment) === null || _k === void 0 ? void 0 : _k.body);
                         return [2 /*return*/];

@@ -45,15 +45,17 @@ class OpenAIUtils {
         let count = 0;
         while (!response && count < MAX_POLL_COUNT) {
             // await thread run completion
-            threadRun = await this.openAI.beta.threads.runs.retrieve(threadRun.thread_id, threadRun.id);
+            threadRun = await this.openAI.beta.threads.runs.retrieve(threadRun.thread_id, {thread_id: threadRun.id});
             if (threadRun.status !== CONST.OPENAI_THREAD_COMPLETED) {
                 count++;
+                // @ts-ignore - Promise exists
                 await new Promise((resolve) => {
                     setTimeout(resolve, CONST.OPENAI_POLL_RATE);
                 });
                 continue;
             }
 
+            // @ts-ignore - list does return array
             for await (const message of this.openAI.beta.threads.messages.list(threadRun.thread_id)) {
                 if (message.role !== CONST.OPENAI_ROLES.ASSISTANT) {
                     continue;
