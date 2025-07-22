@@ -1,7 +1,7 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-const fs = require('fs');
-const path = require('path');
+import * as core from '@actions/core';
+import { context, getOctokit } from '@actions/github';
+import fs from 'fs';
+import path from 'path';
 
 const COVERAGE_SECTION_END = '<!-- END_COVERAGE_SECTION -->';
 
@@ -11,8 +11,8 @@ const COVERAGE_SECTION_END = '<!-- END_COVERAGE_SECTION -->';
 async function getChangedFiles(octokit, prNumber) {
     try {
         const response = await octokit.rest.pulls.listFiles({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
             pull_number: prNumber,
             per_page: 100,
         });
@@ -198,7 +198,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     if (artifactUrl) {
         coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
     }
-    coverageSection += `🔗 [View Workflow Run](https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${workflowRunId})\n`;
+    coverageSection += `🔗 [View Workflow Run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId})\n`;
     coverageSection += `\n${COVERAGE_SECTION_END}`;
 
     return coverageSection;
@@ -211,8 +211,8 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
     try {
         // Get current PR data
         const prResponse = await octokit.rest.pulls.get({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
             pull_number: prNumber,
         });
 
@@ -236,8 +236,8 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
 
         // Update PR body
         await octokit.rest.pulls.update({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
             pull_number: prNumber,
             body: newBody,
         });
@@ -259,7 +259,7 @@ function getCoverageUrl(coverageUrl, artifactName, workflowRunId) {
     }
 
     // Fallback to workflow run artifacts page
-    return `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${workflowRunId}`;
+    return `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId}`;
 }
 
 /**
@@ -268,7 +268,7 @@ function getCoverageUrl(coverageUrl, artifactName, workflowRunId) {
 async function run() {
     try {
         const githubToken = core.getInput('GITHUB_TOKEN', {required: true});
-        const octokit = github.getOctokit(githubToken);
+        const octokit = getOctokit(githubToken);
 
         const prNumber = parseInt(core.getInput('PR_NUMBER', {required: true}), 10);
         const coverageArtifactName = core.getInput('COVERAGE_ARTIFACT_NAME', {required: false}) || 'coverage-report';
@@ -300,7 +300,7 @@ async function run() {
         const coverageData = generateCoverageData(coverage, changedFiles, baseCoverage);
 
         // Get coverage URL
-        const workflowRunId = github.context.runId.toString();
+        const workflowRunId = context.runId.toString();
         const reportUrl = getCoverageUrl(coverageUrl, coverageArtifactName, workflowRunId);
 
         // Generate coverage section
@@ -320,8 +320,7 @@ async function run() {
     }
 }
 
-if (require.main === module) {
-    run();
-}
+// Run the action
+run();
 
-module.exports = run;
+export default run;
