@@ -123,7 +123,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     // Get coverage status for overall lines coverage
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
 
-    let coverageSection = '';
+    let coverageSection = '### Coverage Summary\n\n';
 
     // Enhanced header with status - using both diff-style and emoji format
     if (baseCoverage) {
@@ -131,7 +131,6 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         if (coverageStatus.diff !== 0) {
             const diffPrefix = coverageStatus.diff > 0 ? '+' : '-';
             coverageSection += '```diff\n';
-            coverageSection += '### Coverage Summary\n';
             coverageSection += `${diffPrefix} 📊 Overall Coverage: ${overall.lines.toFixed(2)}% ${coverageStatus.diff > 0 ? '↑' : '↓'} (baseline: ${baseCoverage.lines.toFixed(2)}%)\n`;
             coverageSection += '```\n\n';
         }
