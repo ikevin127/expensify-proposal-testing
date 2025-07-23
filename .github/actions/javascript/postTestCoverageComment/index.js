@@ -31863,74 +31863,74 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     
     // Local template for easy editing
     const coverageTemplate = `
-    ### 🧪 Test Coverage Report
+### 🧪 Test Coverage Report
 
-    {{#hasBaseline}}
-    {{#status.hasChange}}
-    \`\`\`diff
-    {{#status.isIncrease}}
-    + 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
-    {{/status.isIncrease}}
-    {{#status.isDecrease}}
-    - 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
-    {{/status.isDecrease}}
-    \`\`\`
+{{#hasBaseline}}
+{{#status.hasChange}}
+\`\`\`diff
+{{#status.isIncrease}}
++ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
+{{/status.isIncrease}}
+{{#status.isDecrease}}
+- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
+{{/status.isDecrease}}
+\`\`\`
 
-    {{/status.hasChange}}
-    {{/hasBaseline}}
+{{/status.hasChange}}
+{{/hasBaseline}}
 
-    {{#status.hasChange}}
-    {{status.emoji}} **{{status.text}}**
-    {{#hasBaseline}}
-    📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
-    {{status.changeEmoji}} {{status.changeText}} from baseline
-    {{/hasBaseline}}
-    {{/status.hasChange}}
-    {{^status.hasChange}}
-    {{#hasBaseline}}
-    {{status.emoji}} **{{status.text}}**
-    📊 Overall Coverage: {{current.lines}}% (unchanged)
-    {{/hasBaseline}}
-    {{^hasBaseline}}
-    📊 **Overall Coverage**: {{current.lines}}%
-    {{/hasBaseline}}
-    {{/status.hasChange}}
+{{#status.hasChange}}
+{{status.emoji}} **{{status.text}}**
+{{#hasBaseline}}
+📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
+{{status.changeEmoji}} {{status.changeText}} from baseline
+{{/hasBaseline}}
+{{/status.hasChange}}
+{{^status.hasChange}}
+{{#hasBaseline}}
+{{status.emoji}} **{{status.text}}**
+📊 Overall Coverage: {{current.lines}}% (unchanged)
+{{/hasBaseline}}
+{{^hasBaseline}}
+📊 **Overall Coverage**: {{current.lines}}%
+{{/hasBaseline}}
+{{/status.hasChange}}
 
-    <details>
-    <summary>📋 Coverage Details</summary>
+<details>
+<summary>📋 Coverage Details</summary>
 
-    {{#hasChangedFiles}}
-    | File | Coverage | Lines |
-    |------|----------|-------|
-    {{#changedFiles}}
-    | {{displayFile}} | {{coverage}}% | {{lines}} |
-    {{/changedFiles}}
+{{#hasChangedFiles}}
+| File | Coverage | Lines |
+|------|----------|-------|
+{{#changedFiles}}
+| {{displayFile}} | {{coverage}}% | {{lines}} |
+{{/changedFiles}}
 
-    {{/hasChangedFiles}}
-    {{^hasChangedFiles}}
-    *No changed files with coverage data found.*
+{{/hasChangedFiles}}
+{{^hasChangedFiles}}
+*No changed files with coverage data found.*
 
-    {{/hasChangedFiles}}
-    ### Overall Coverage Summary
-    {{#hasBaseline}}
-    - **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
-    - **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
-    - **Functions**: {{current.functions}}% ({{changes.functions.emoji}} {{changes.functions.text}})
-    - **Branches**: {{current.branches}}% ({{changes.branches.emoji}} {{changes.branches.text}})
-    {{/hasBaseline}}
-    {{^hasBaseline}}
-    - **Lines**: {{current.lines}}%
-    - **Statements**: {{current.statements}}%
-    - **Functions**: {{current.functions}}%
-    - **Branches**: {{current.branches}}%
-    {{/hasBaseline}}
+{{/hasChangedFiles}}
+### Overall Coverage Summary
+{{#hasBaseline}}
+- **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
+- **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
+- **Functions**: {{current.functions}}% ({{changes.functions.emoji}} {{changes.functions.text}})
+- **Branches**: {{current.branches}}% ({{changes.branches.emoji}} {{changes.branches.text}})
+{{/hasBaseline}}
+{{^hasBaseline}}
+- **Lines**: {{current.lines}}%
+- **Statements**: {{current.statements}}%
+- **Functions**: {{current.functions}}%
+- **Branches**: {{current.branches}}%
+{{/hasBaseline}}
 
-    </details>
+</details>
 
-    📄 [View Full Coverage Report]({{links.coverageReport}})
-    🔗 [View Workflow Run Summary]({{links.workflowRun}})
+📄 [View Full Coverage Report]({{links.coverageReport}})
+🔗 [View Workflow Run Summary]({{links.workflowRun}})
 
-    <!-- END_COVERAGE_SECTION -->`;
+<!-- END_COVERAGE_SECTION -->`;
     
     // Get coverage status for overall lines coverage
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
@@ -32103,7 +32103,6 @@ async function run() {
         const prNumber = parseInt(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('PR_NUMBER', {required: true}), 10);
         const baseCoveragePath = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('BASE_COVERAGE_PATH', {required: false});
         const coverageUrl = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('COVERAGE_URL', {required: false});
-        const customTemplatePath = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('TEMPLATE_PATH', {required: false});
 
         console.log(`Processing test coverage for PR #${prNumber}`);
 
@@ -32134,7 +32133,7 @@ async function run() {
         const reportUrl = getCoverageUrl(coverageUrl, workflowRunId);
 
         // Generate coverage section
-        const coverageSection = generateCoverageSection(coverageData, reportUrl, workflowRunId, customTemplatePath);
+        const coverageSection = generateCoverageSection(coverageData, reportUrl, workflowRunId);
 
         // Update PR body with coverage information
         await updatePRBody(octokit, prNumber, coverageSection);

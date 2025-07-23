@@ -346,3 +346,29 @@ export function celsiusToFahrenheit(celsius: number): number {
     
     return (celsius * 9/5) + 32;
 }
+
+/**
+ * Calculate the volume of a cylinder (UNTESTED)
+ */
+export function cylinderVolume(radius: number, height: number): number {
+    if (radius < 0 || height < 0) {
+        throw new Error('Radius and height must be non-negative');
+    }
+    
+    return Math.PI * radius * radius * height;
+}
+
+/**
+ * Calculate the sum of squares from 1 to n (UNTESTED)
+ */
+export function sumOfSquares(n: number): number {
+    if (n < 0) {
+        throw new Error('Input must be non-negative');
+    }
+    
+    if (!Number.isInteger(n)) {
+        throw new Error('Input must be an integer');
+    }
+    
+    return (n * (n + 1) * (2 * n + 1)) / 6;
+}
