@@ -31713,10 +31713,15 @@ var __webpack_exports__ = {};
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
 /* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(9896);
 /* harmony import */ var path__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6928);
+/* harmony import */ var url__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(7016);
 
 
 
 
+
+
+const __filename = (0,url__WEBPACK_IMPORTED_MODULE_4__.fileURLToPath)(import.meta.url);
+const __dirname = path__WEBPACK_IMPORTED_MODULE_3__.dirname(__filename);
 
 const COVERAGE_SECTION_END = '<!-- END_COVERAGE_SECTION -->';
 
@@ -31810,6 +31815,63 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
 }
 
 /**
+ * Simple mustache-like template engine
+ */
+function renderTemplate(template, data) {
+    let result = template;
+    
+    // Handle conditional blocks {{#condition}} ... {{/condition}}
+    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, condition, content) => {
+        const value = getNestedValue(data, condition);
+        return value ? renderTemplate(content, data) : '';
+    });
+    
+    // Handle inverted conditional blocks {{^condition}} ... {{/condition}}
+    result = result.replace(/\{\{\^([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, condition, content) => {
+        const value = getNestedValue(data, condition);
+        return !value ? renderTemplate(content, data) : '';
+    });
+    
+    // Handle array iterations {{#array}} ... {{/array}}
+    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, arrayName, content) => {
+        const array = getNestedValue(data, arrayName);
+        if (Array.isArray(array)) {
+            return array.map(item => renderTemplate(content, {...data, ...item})).join('');
+        }
+        return '';
+    });
+    
+    // Handle variable substitutions {{variable}}
+    result = result.replace(/\{\{([^}#^/]+)\}\}/g, (match, variable) => {
+        const value = getNestedValue(data, variable.trim());
+        return value !== undefined ? value : '';
+    });
+    
+    return result;
+}
+
+/**
+ * Get nested value from object using dot notation
+ */
+function getNestedValue(obj, path) {
+    return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+}
+
+/**
+ * Load template from file
+ */
+function loadTemplate(templatePath) {
+    try {
+        return fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(templatePath, 'utf8');
+    } catch (error) {
+        console.error(`Error loading template from ${templatePath}:`, error);
+        throw error;
+    }
+}
+
+/**
  * Generate coverage status emoji and text based on comparison with baseline
  */
 function getCoverageStatus(current, base) {
@@ -31827,46 +31889,76 @@ function getCoverageStatus(current, base) {
 }
 
 /**
- * Generate enhanced coverage section markdown with better formatting
+ * Generate enhanced coverage section markdown using template
  */
-function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
+function generateCoverageSection(coverageData, artifactUrl, workflowRunId, customTemplatePath = null) {
     const {overall, changedFiles, baseCoverage} = coverageData;
-
+    
+    // Load template
+    const templatePath = customTemplatePath || __nccwpck_require__.ab + "coverageTemplate.md";
+    const template = loadTemplate(templatePath);
+    
     // Get coverage status for overall lines coverage
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
-
-    let coverageSection = '### Coverage Summary\n\n';
-
-    // Enhanced header with status - using both diff-style and emoji format
-    if (baseCoverage) {
-        // Diff-style format at the top - always show both baseline and current
-        coverageSection += '```diff\n';
-        coverageSection += `- 📊 Overall Coverage: ${baseCoverage.lines.toFixed(2)}% (baseline)\n`;
-        coverageSection += `+ 📊 Overall Coverage: ${overall.lines.toFixed(2)}% ${coverageStatus.diff > 0 ? '↑' : coverageStatus.diff < 0 ? '↓' : '→'} (current PR)\n`;
-        coverageSection += '```\n\n';
-
-        // Emoji-style format below
-        coverageSection += `${coverageStatus.emoji} **${coverageStatus.status}**\n`;
-        if (coverageStatus.diff !== 0) {
-            const arrow = coverageStatus.diff > 0 ? '↑' : '↓';
-            const gain = coverageStatus.diff > 0 ? 'gain' : 'drop';
-            coverageSection += `📈 Overall Coverage: ${overall.lines.toFixed(1)}% ${arrow}\n`;
-            coverageSection += `${coverageStatus.diff > 0 ? '🚀' : '⚠️'} ${Math.abs(coverageStatus.diff).toFixed(1)}% ${gain} from baseline\n`;
-        } else {
-            coverageSection += `📊 Overall Coverage: ${overall.lines.toFixed(1)}% (unchanged)\n`;
+    
+    // Calculate changes for all metrics
+    const changes = baseCoverage ? {
+        lines: calculateChange(overall.lines, baseCoverage.lines),
+        functions: calculateChange(overall.functions, baseCoverage.functions),
+        statements: calculateChange(overall.statements, baseCoverage.statements)
+    } : {};
+    
+    // Prepare template data
+    const templateData = {
+        hasBaseline: !!baseCoverage,
+        hasDetailedBreakdown: false,
+        hasChangedFiles: false,
+        
+        current: {
+            lines: overall.lines.toFixed(1),
+            functions: overall.functions.toFixed(1),
+            statements: overall.statements.toFixed(1)
+        },
+        
+        baseline: baseCoverage ? {
+            lines: baseCoverage.lines.toFixed(2),
+            functions: baseCoverage.functions.toFixed(2),
+            statements: baseCoverage.statements.toFixed(2)
+        } : null,
+        
+        diffArrow: coverageStatus.diff > 0 ? '↑' : coverageStatus.diff < 0 ? '↓' : '→',
+        
+        status: {
+            emoji: coverageStatus.emoji,
+            text: coverageStatus.status,
+            hasChange: coverageStatus.diff !== 0,
+            arrow: coverageStatus.diff > 0 ? '↑' : '↓',
+            changeEmoji: coverageStatus.diff > 0 ? '🚀' : '⚠️',
+            changeText: `${Math.abs(coverageStatus.diff).toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
+        },
+        
+        changes,
+        changedFiles,
+        
+        links: {
+            coverageReport: artifactUrl,
+            workflowRun: `https://github.com/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner}/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo}/actions/runs/${workflowRunId}`
         }
-    } else {
-        coverageSection += `📊 **Overall Coverage**: ${overall.lines.toFixed(1)}%\n`;
-    }
+    };
+    
+    return renderTemplate(template, templateData);
+}
 
-    // Links section
-    if (artifactUrl) {
-        coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
+/**
+ * Calculate coverage change with formatting
+ */
+function calculateChange(current, baseline) {
+    const diff = current - baseline;
+    if (Math.abs(diff) < 0.01) {
+        return '→ 0.0%';
     }
-    coverageSection += `🔗 [View Workflow Run Summary](https://github.com/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner}/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo}/actions/runs/${workflowRunId})\n`;
-    coverageSection += `\n${COVERAGE_SECTION_END}`;
-
-    return coverageSection;
+    const arrow = diff > 0 ? '↑' : '↓';
+    return `${arrow} ${Math.abs(diff).toFixed(1)}%`;
 }
 
 /**
@@ -31939,6 +32031,7 @@ async function run() {
         const coverageArtifactName = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('COVERAGE_ARTIFACT_NAME', {required: false}) || 'coverage-report';
         const baseCoveragePath = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('BASE_COVERAGE_PATH', {required: false});
         const coverageUrl = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('COVERAGE_URL', {required: false});
+        const customTemplatePath = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('TEMPLATE_PATH', {required: false});
 
         console.log(`Processing test coverage for PR #${prNumber}`);
 
@@ -31969,7 +32062,7 @@ async function run() {
         const reportUrl = getCoverageUrl(coverageUrl, coverageArtifactName, workflowRunId);
 
         // Generate coverage section
-        const coverageSection = generateCoverageSection(coverageData, reportUrl, workflowRunId);
+        const coverageSection = generateCoverageSection(coverageData, reportUrl, workflowRunId, customTemplatePath);
 
         // Update PR body with coverage information
         await updatePRBody(octokit, prNumber, coverageSection);
