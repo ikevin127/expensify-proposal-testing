@@ -179,7 +179,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId, custo
     const {overall, changedFiles, baseCoverage} = coverageData;
     
     // Load template
-    const templatePath = customTemplatePath || path.join(__dirname, 'coverageTemplate.md');
+    const templatePath = customTemplatePath || path.join(__dirname, 'dist/coverageTemplate.md');
     const template = loadTemplate(templatePath);
     
     // Get coverage status for overall lines coverage
