@@ -144,55 +144,11 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         coverageSection += `📊 **Overall Coverage**: ${overall.lines.toFixed(1)}%\n`;
     }
 
-    // Details section
-    coverageSection += '\n<details>\n<summary>📋 Coverage Details</summary>\n\n';
-
-    // Changed files table
-    if (changedFiles.length > 0) {
-        coverageSection += '| File | Coverage | Lines |\n';
-        coverageSection += '|------|----------|-------|\n';
-
-        changedFiles.forEach((file) => {
-            const displayFile = file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file;
-            coverageSection += `| \`${displayFile}\` | ${file.coverage.toFixed(1)}% | ${file.lines} |\n`;
-        });
-        coverageSection += '\n';
-    } else {
-        coverageSection += '*No changed files with coverage data found.*\n\n';
-    }
-
-    // Overall coverage summary with comparisons
-    coverageSection += '### Overall Coverage Summary\n';
-
-    const formatMetric = (name, current, base) => {
-        if (!base) {
-            return `- **${name}**: ${current.toFixed(2)}%`;
-        }
-        const diff = current - base;
-        if (Math.abs(diff) < 0.01) {
-            return `- **${name}**: ${current.toFixed(2)}%`;
-        }
-        const sign = diff > 0 ? '+' : '';
-        const emoji = diff > 0 ? '📈' : '📉';
-        return `- **${name}**: ${current.toFixed(2)}% (${emoji} ${sign}${diff.toFixed(2)}%)`;
-    };
-
-    coverageSection += `${formatMetric('Lines', overall.lines, baseCoverage?.lines)}\n`;
-    coverageSection += `${formatMetric('Statements', overall.statements, baseCoverage?.statements)}\n`;
-    coverageSection += `${formatMetric('Functions', overall.functions, baseCoverage?.functions)}\n`;
-
     // Links section
-    coverageSection += '\n</details>\n\n';
     if (artifactUrl) {
         coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
     }
     coverageSection += `🔗 [View Workflow Run Summary](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId})\n`;
-    // Clean up any unwanted lines or columns as a safety measure
-    coverageSection = coverageSection.replace(/\n📈 Changed Files: .* average coverage/, '').replace(/\| Branches \|[\s\S]*\n/g, '');
-    
-    // Ensure the workflow link includes "Summary" at the end
-    coverageSection = coverageSection.replace(/🔗 \[View Workflow Run\]/g, '🔗 [View Workflow Run Summary]');
-
     coverageSection += `\n${COVERAGE_SECTION_END}`;
 
     return coverageSection;
