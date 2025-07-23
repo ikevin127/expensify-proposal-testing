@@ -127,13 +127,11 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 
     // Enhanced header with status - using both diff-style and emoji format
     if (baseCoverage) {
-        // Diff-style format at the top
-        if (coverageStatus.diff !== 0) {
-            const diffPrefix = coverageStatus.diff > 0 ? '+' : '-';
-            coverageSection += '```diff\n';
-            coverageSection += `${diffPrefix} 📊 Overall Coverage: ${overall.lines.toFixed(2)}% ${coverageStatus.diff > 0 ? '↑' : '↓'} (baseline: ${baseCoverage.lines.toFixed(2)}%)\n`;
-            coverageSection += '```\n\n';
-        }
+        // Diff-style format at the top - always show both baseline and current
+        coverageSection += '```diff\n';
+        coverageSection += `- 📊 Overall Coverage: ${baseCoverage.lines.toFixed(2)}% (baseline)\n`;
+        coverageSection += `+ 📊 Overall Coverage: ${overall.lines.toFixed(2)}% ${coverageStatus.diff > 0 ? '↑' : coverageStatus.diff < 0 ? '↓' : '→'} (current PR)\n`;
+        coverageSection += '```\n\n';
 
         // Emoji-style format below
         coverageSection += `${coverageStatus.emoji} **${coverageStatus.status}**\n`;

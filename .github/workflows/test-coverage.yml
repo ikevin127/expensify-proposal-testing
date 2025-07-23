@@ -24,6 +24,22 @@ jobs:
       - name: Run tests
         run: npm run test:coverage
 
+      - name: Generate baseline coverage from main branch
+        run: |
+          # Create a temporary directory for main branch
+          git fetch origin main
+          git checkout main -- .
+          
+          # Install dependencies and run coverage for main branch
+          npm run test:coverage
+          
+          # Move main branch coverage to baseline directory
+          mv coverage baseline-coverage
+          
+          # Switch back to PR branch and regenerate coverage
+          git checkout ${{ github.head_ref }} -- .
+          npm run test:coverage
+
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -52,3 +68,4 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           COVERAGE_ARTIFACT_NAME: coverage-report
           COVERAGE_URL: ${{ env.COVERAGE_URL }}
+          BASE_COVERAGE_PATH: ./baseline-coverage
