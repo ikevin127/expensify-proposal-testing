@@ -102,7 +102,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const {overall, changedFiles, baseCoverage} = coverageData;
 
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
-    let coverageSection = '';
+    let coverageSection = '### 📊 Test Coverage Report\n\n';
 
     if (baseCoverage) {
         if (coverageStatus.diff !== 0) {
@@ -210,7 +210,7 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
             newBody = `${beforeCoverage}${COVERAGE_SECTION_START}\n${coverageSection}${afterCoverage}`;
         } else {
             // Add coverage section at the end
-            const separator = currentBody.trim() ? '\n\n---\n\n' : '';
+            const separator = currentBody.trim() ? '\n\n##\n\n' : '';
             newBody = `${currentBody + separator}\n${COVERAGE_SECTION_START}\n${coverageSection}`;
         }
 
