@@ -105,3 +105,179 @@ export function average(numbers: number[]): number {
     const sum = numbers.reduce((acc, num) => acc + num, 0);
     return sum / numbers.length;
 }
+
+/**
+ * Calculate the power of a number (UNTESTED - will reduce coverage)
+ */
+export function power(base: number, exponent: number): number {
+    if (exponent === 0) {
+        return 1;
+    }
+    
+    if (exponent < 0) {
+        return 1 / power(base, -exponent);
+    }
+    
+    let result = 1;
+    for (let i = 0; i < exponent; i++) {
+        result *= base;
+    }
+    
+    return result;
+}
+
+/**
+ * Calculate the square root using Newton's method (UNTESTED)
+ */
+export function sqrt(n: number): number {
+    if (n < 0) {
+        throw new Error('Cannot calculate square root of negative number');
+    }
+    
+    if (n === 0 || n === 1) {
+        return n;
+    }
+    
+    let guess = n / 2;
+    let previousGuess;
+    
+    do {
+        previousGuess = guess;
+        guess = (guess + n / guess) / 2;
+    } while (Math.abs(guess - previousGuess) > 0.000001);
+    
+    return guess;
+}
+
+/**
+ * Calculate the greatest common divisor (UNTESTED)
+ */
+export function gcd(a: number, b: number): number {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    
+    while (b !== 0) {
+        const temp = b;
+        b = a % b;
+        a = temp;
+    }
+    
+    return a;
+}
+
+/**
+ * Calculate the least common multiple (UNTESTED)
+ */
+export function lcm(a: number, b: number): number {
+    if (a === 0 || b === 0) {
+        return 0;
+    }
+    
+    return Math.abs(a * b) / gcd(a, b);
+}
+
+/**
+ * Generate Fibonacci sequence up to n terms (UNTESTED)
+ */
+export function fibonacci(n: number): number[] {
+    if (n <= 0) {
+        return [];
+    }
+    
+    if (n === 1) {
+        return [0];
+    }
+    
+    const sequence = [0, 1];
+    
+    for (let i = 2; i < n; i++) {
+        sequence.push(sequence[i - 1] + sequence[i - 2]);
+    }
+    
+    return sequence;
+}
+
+/**
+ * Check if a number is a perfect square (UNTESTED)
+ */
+export function isPerfectSquare(n: number): boolean {
+    if (n < 0) {
+        return false;
+    }
+    
+    const sqrtN = Math.floor(Math.sqrt(n));
+    return sqrtN * sqrtN === n;
+}
+
+/**
+ * Convert degrees to radians (UNTESTED)
+ */
+export function degreesToRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+}
+
+/**
+ * Convert radians to degrees (UNTESTED)
+ */
+export function radiansToDegrees(radians: number): number {
+    return radians * (180 / Math.PI);
+}
+
+/**
+ * Calculate the area of a circle (UNTESTED)
+ */
+export function circleArea(radius: number): number {
+    if (radius < 0) {
+        throw new Error('Radius cannot be negative');
+    }
+    
+    return Math.PI * radius * radius;
+}
+
+/**
+ * Calculate the circumference of a circle (UNTESTED)
+ */
+export function circleCircumference(radius: number): number {
+    if (radius < 0) {
+        throw new Error('Radius cannot be negative');
+    }
+    
+    return 2 * Math.PI * radius;
+}
+
+/**
+ * Generate a random integer between min and max (inclusive) (UNTESTED)
+ */
+export function randomInt(min: number, max: number): number {
+    if (min > max) {
+        throw new Error('Min cannot be greater than max');
+    }
+    
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Calculate compound interest (UNTESTED)
+ */
+export function compoundInterest(
+    principal: number,
+    rate: number,
+    time: number,
+    compoundingFrequency: number = 1
+): number {
+    if (principal < 0 || rate < 0 || time < 0 || compoundingFrequency <= 0) {
+        throw new Error('Invalid input parameters');
+    }
+    
+    return principal * Math.pow(1 + rate / compoundingFrequency, compoundingFrequency * time);
+}
+
+/**
+ * Calculate the distance between two points (UNTESTED)
+ */
+export function distance(x1: number, y1: number, x2: number, y2: number): number {
+    const deltaX = x2 - x1;
+    const deltaY = y2 - y1;
+    
+    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+}
