@@ -198,7 +198,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     if (artifactUrl) {
         coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
     }
-    coverageSection += `🔗 [View Workflow Run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId})\n`;
+    coverageSection += `🔗 [View Workflow Run Summary](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId})\n`;
     coverageSection += `\n${COVERAGE_SECTION_END}`;
 
     return coverageSection;

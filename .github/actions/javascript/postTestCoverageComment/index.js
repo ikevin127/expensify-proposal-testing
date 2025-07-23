@@ -31913,7 +31913,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     if (artifactUrl) {
         coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
     }
-    coverageSection += `🔗 [View Workflow Run](https://github.com/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner}/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo}/actions/runs/${workflowRunId})\n`;
+    coverageSection += `🔗 [View Workflow Run Summary](https://github.com/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner}/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo}/actions/runs/${workflowRunId})\n`;
     coverageSection += `\n${COVERAGE_SECTION_END}`;
 
     return coverageSection;
