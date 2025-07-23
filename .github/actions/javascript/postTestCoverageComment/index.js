@@ -31902,6 +31902,12 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
     }
     coverageSection += `🔗 [View Workflow Run Summary](https://github.com/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner}/${_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo}/actions/runs/${workflowRunId})\n`;
+    // Clean up any unwanted lines or columns as a safety measure
+    coverageSection = coverageSection.replace(/\n📈 Changed Files: .* average coverage/, '').replace(/\| Branches \|[\s\S]*\n/g, '');
+    
+    // Ensure the workflow link includes "Summary" at the end
+    coverageSection = coverageSection.replace(/🔗 \[View Workflow Run\]/g, '🔗 [View Workflow Run Summary]');
+
     coverageSection += `\n${COVERAGE_SECTION_END}`;
 
     return coverageSection;
