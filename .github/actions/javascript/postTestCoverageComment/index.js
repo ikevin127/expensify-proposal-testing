@@ -31766,7 +31766,6 @@ function parseCoverageSummary(coveragePath) {
 function generateCoverageData(coverage, changedFiles, baseCoverage) {
     const overall = {
         statements: coverage.total.statements.pct,
-        branches: coverage.total.branches.pct,
         functions: coverage.total.functions.pct,
         lines: coverage.total.lines.pct,
     };
@@ -31788,7 +31787,6 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
                       file,
                       coverage: fileCoverage.lines.pct,
                       lines: `${fileCoverage.lines.covered}/${fileCoverage.lines.total}`,
-                      branches: `${fileCoverage.branches.covered}/${fileCoverage.branches.total}`,
                   }
                 : null;
         })
@@ -31803,7 +31801,6 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
     if (baseCoverage) {
         result.baseCoverage = {
             statements: baseCoverage.total.statements.pct,
-            branches: baseCoverage.total.branches.pct,
             functions: baseCoverage.total.functions.pct,
             lines: baseCoverage.total.lines.pct,
         };
