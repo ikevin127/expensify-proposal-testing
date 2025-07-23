@@ -281,3 +281,40 @@ export function distance(x1: number, y1: number, x2: number, y2: number): number
     
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 }
+
+/**
+ * Calculate the median of an array of numbers (UNTESTED)
+ */
+export function median(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate median of empty array');
+    }
+    
+    const sorted = [...numbers].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    
+    if (sorted.length % 2 === 0) {
+        return (sorted[middle - 1] + sorted[middle]) / 2;
+    } else {
+        return sorted[middle];
+    }
+}
+
+/**
+ * Check if a year is a leap year (UNTESTED)
+ */
+export function isLeapYear(year: number): boolean {
+    if (year % 4 !== 0) {
+        return false;
+    }
+    
+    if (year % 100 !== 0) {
+        return true;
+    }
+    
+    if (year % 400 === 0) {
+        return true;
+    }
+    
+    return false;
+}
