@@ -31947,12 +31947,12 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const processedChangedFiles = changedFiles.map(file => ({
         ...file,
         displayFile: file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file,
-        coverage: file.coverage?.toFixed(1) ?? 'N/A',
+        coverage: file.coverage?.toFixed(1),
         branches: file.branches || 'N/A'
     }));
     
     const avgChangedCoverage = changedFiles.length > 0 
-        ? (changedFiles.reduce((sum, file) => sum + file.coverage, 0) / changedFiles.length).toFixed(1)
+        ? (changedFiles.reduce((sum, file) => sum + file.coverage, 0) / changedFiles.length)?.toFixed(1)
         : 0;
     
     // Prepare template data
@@ -31962,17 +31962,17 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         avgChangedCoverage,
         
         current: {
-            lines: overall.lines.toFixed(1),
-            functions: overall.functions.toFixed(1),
-            statements: overall.statements.toFixed(1),
-            branches: overall.branches?.toFixed(1)  ?? 'N/A'
+            lines: overall.lines?.toFixed(1),
+            functions: overall.functions?.toFixed(1),
+            statements: overall.statements?.toFixed(1),
+            branches: overall.branches?.toFixed(1)
         },
         
         baseline: baseCoverage ? {
-            lines: baseCoverage.lines.toFixed(2),
-            functions: baseCoverage.functions.toFixed(2),
-            statements: baseCoverage.statements.toFixed(2),
-            branches: baseCoverage.branches?.toFixed(2) ?? 'N/A'
+            lines: baseCoverage.lines?.toFixed(2),
+            functions: baseCoverage.functions?.toFixed(2),
+            statements: baseCoverage.statements?.toFixed(2),
+            branches: baseCoverage.branches?.toFixed(2)
         } : null,
         
         status: {
@@ -31983,7 +31983,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
             isDecrease: coverageStatus.diff < 0,
             arrow: coverageStatus.diff > 0 ? '↑' : '↓',
             changeEmoji: coverageStatus.diff > 0 ? '🚀' : '⚠️',
-            changeText: `${Math.abs(coverageStatus.diff).toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
+            changeText: `${Math.abs(coverageStatus.diff)?.toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
         },
         
         changes,
@@ -32012,8 +32012,8 @@ function calculateChange(current, baseline) {
     const arrow = diff > 0 ? '↑' : '↓';
     const emoji = diff > 0 ? '📈' : '📉';
     return {
-        text: `${diff > 0 ? '+' : ''}${diff.toFixed(2)}%`,
-        emoji: `${emoji} ${arrow} ${Math.abs(diff).toFixed(1)}%`
+        text: `${diff > 0 ? '+' : ''}${diff?.toFixed(2)}%`,
+        emoji: `${emoji} ${arrow} ${Math.abs(diff)?.toFixed(1)}%`
     };
 }
 
