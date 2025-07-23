@@ -179,7 +179,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId, custo
     const {overall, changedFiles, baseCoverage} = coverageData;
     
     // Load template
-    const templatePath = customTemplatePath || path.join(__dirname, 'dist/coverageTemplate.md');
+    const templatePath = customTemplatePath || path.join(__dirname, 'coverageTemplate.md');
     const template = loadTemplate(templatePath);
     
     // Get coverage status for overall lines coverage
@@ -268,7 +268,7 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
             // Replace existing coverage section
             const beforeCoverage = currentBody.substring(0, coverageStartIndex);
             const afterCoverage = currentBody.substring(coverageEndIndex + COVERAGE_SECTION_END.length);
-            newBody = `${beforeCoverage}\n<!-- START_COVERAGE_SECTION -->\n${coverageSection}\n${afterCoverage}`;
+            newBody = `${beforeCoverage}<!-- START_COVERAGE_SECTION -->\n${coverageSection}${afterCoverage}`;
         } else {
             // Add coverage section at the end
             const separator = currentBody.trim() ? '\n\n---\n\n' : '';
