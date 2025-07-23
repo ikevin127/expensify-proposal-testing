@@ -96,75 +96,210 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
 }
 
 /**
- * Generate enhanced coverage section markdown using template
+ * Simple mustache-like template engine
+ */
+function renderTemplate(template, data) {
+    let result = template;
+    
+    // Handle conditional blocks {{#condition}} ... {{/condition}}
+    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, condition, content) => {
+        const value = getNestedValue(data, condition);
+        return value ? renderTemplate(content, data) : '';
+    });
+    
+    // Handle inverted conditional blocks {{^condition}} ... {{/condition}}
+    result = result.replace(/\{\{\^([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, condition, content) => {
+        const value = getNestedValue(data, condition);
+        return !value ? renderTemplate(content, data) : '';
+    });
+    
+    // Handle array iterations {{#array}} ... {{/array}}
+    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, arrayName, content) => {
+        const array = getNestedValue(data, arrayName);
+        if (Array.isArray(array)) {
+            return array.map(item => renderTemplate(content, {...data, ...item})).join('');
+        }
+        return '';
+    });
+    
+    // Handle variable substitutions {{variable}}
+    result = result.replace(/\{\{([^}#^/]+)\}\}/g, (match, variable) => {
+        const value = getNestedValue(data, variable.trim());
+        return value !== undefined ? value : '';
+    });
+    
+    return result;
+}
+
+/**
+ * Get nested value from object using dot notation
+ */
+function getNestedValue(obj, path) {
+    return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+}
+
+/**
+ * Generate enhanced coverage section markdown with better formatting
  */
 function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const {overall, changedFiles, baseCoverage} = coverageData;
+    
+    // Local template for easy editing
+    const coverageTemplate = `
+    ### 📊 Test Coverage Report
 
+    {{#hasBaseline}}
+    {{#status.hasChange}}
+    \`\`\`diff
+    {{#status.isIncrease}}
+    + 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
+    {{/status.isIncrease}}
+    {{#status.isDecrease}}
+    - 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
+    {{/status.isDecrease}}
+    \`\`\`
+
+    {{/status.hasChange}}
+    {{/hasBaseline}}
+
+    {{#status.hasChange}}
+    {{status.emoji}} **{{status.text}}**
+    {{#hasBaseline}}
+    📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
+    {{status.changeEmoji}} {{status.changeText}} from baseline
+    {{/hasBaseline}}
+    {{/status.hasChange}}
+    {{^status.hasChange}}
+    {{#hasBaseline}}
+    {{status.emoji}} **{{status.text}}**
+    📊 Overall Coverage: {{current.lines}}% (unchanged)
+    {{/hasBaseline}}
+    {{^hasBaseline}}
+    📊 **Overall Coverage**: {{current.lines}}%
+    {{/hasBaseline}}
+    {{/status.hasChange}}
+
+    <details>
+    <summary>📋 Coverage Details</summary>
+
+    {{#hasChangedFiles}}
+    | File | Coverage | Lines |
+    |------|----------|-------|
+    {{#changedFiles}}
+    | \`{{displayFile}}\` | {{coverage}}% | {{lines}} |
+    {{/changedFiles}}
+
+    {{/hasChangedFiles}}
+    {{^hasChangedFiles}}
+    *No changed files with coverage data found.*
+
+    {{/hasChangedFiles}}
+    ### Overall Coverage Summary
+    {{#hasBaseline}}
+    - **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
+    - **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
+    - **Functions**: {{current.functions}}% ({{changes.functions.emoji}} {{changes.functions.text}})
+    - **Branches**: {{current.branches}}% ({{changes.branches.emoji}} {{changes.branches.text}})
+    {{/hasBaseline}}
+    {{^hasBaseline}}
+    - **Lines**: {{current.lines}}%
+    - **Statements**: {{current.statements}}%
+    - **Functions**: {{current.functions}}%
+    - **Branches**: {{current.branches}}%
+    {{/hasBaseline}}
+
+    </details>
+
+    📄 [View Full Coverage Report]({{links.coverageReport}})
+    🔗 [View Workflow Run Summary]({{links.workflowRun}})
+
+    <!-- END_COVERAGE_SECTION -->`;
+    
+    // Get coverage status for overall lines coverage
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
-    let coverageSection = '### 📊 Test Coverage Report\n\n';
-
-    if (baseCoverage) {
-        if (coverageStatus.diff !== 0) {
-            const diffPrefix = coverageStatus.diff > 0 ? '+' : '-';
-            coverageSection += '```diff\n';
-            coverageSection += `${diffPrefix} 📊 Overall Coverage: ${overall.lines.toFixed(2)}% ${coverageStatus.diff > 0 ? '↑' : '↓'} (baseline: ${baseCoverage.lines.toFixed(2)}%)\n`;
-            coverageSection += '```\n\n';
+    
+    // Calculate changes for all metrics
+    const changes = baseCoverage ? {
+        lines: calculateChange(overall.lines, baseCoverage.lines),
+        statements: calculateChange(overall.statements, baseCoverage.statements),
+        functions: calculateChange(overall.functions, baseCoverage.functions),
+        branches: calculateChange(overall.branches, baseCoverage.branches)
+    } : {};
+    
+    // Process changed files for template
+    const processedChangedFiles = changedFiles.map(file => ({
+        ...file,
+        displayFile: file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file,
+        coverage: file.coverage.toFixed(1),
+        branches: file.branches || 'N/A'
+    }));
+    
+    const avgChangedCoverage = changedFiles.length > 0 
+        ? (changedFiles.reduce((sum, file) => sum + file.coverage, 0) / changedFiles.length).toFixed(1)
+        : 0;
+    
+    // Prepare template data
+    const templateData = {
+        hasBaseline: !!baseCoverage,
+        hasChangedFiles: changedFiles.length > 0,
+        avgChangedCoverage,
+        
+        current: {
+            lines: overall.lines.toFixed(1),
+            functions: overall.functions.toFixed(1),
+            statements: overall.statements.toFixed(1),
+            branches: overall.branches.toFixed(1)
+        },
+        
+        baseline: baseCoverage ? {
+            lines: baseCoverage.lines.toFixed(2),
+            functions: baseCoverage.functions.toFixed(2),
+            statements: baseCoverage.statements.toFixed(2),
+            branches: baseCoverage.branches.toFixed(2)
+        } : null,
+        
+        status: {
+            emoji: coverageStatus.emoji,
+            text: coverageStatus.status,
+            hasChange: coverageStatus.diff !== 0,
+            isIncrease: coverageStatus.diff > 0,
+            isDecrease: coverageStatus.diff < 0,
+            arrow: coverageStatus.diff > 0 ? '↑' : '↓',
+            changeEmoji: coverageStatus.diff > 0 ? '🚀' : '⚠️',
+            changeText: `${Math.abs(coverageStatus.diff).toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
+        },
+        
+        changes,
+        changedFiles: processedChangedFiles,
+        
+        links: {
+            coverageReport: artifactUrl,
+            workflowRun: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId}`
         }
-
-        coverageSection += `${coverageStatus.emoji} **${coverageStatus.status}**\n`;
-        if (coverageStatus.diff !== 0) {
-            const arrow = coverageStatus.diff > 0 ? '↑' : '↓';
-            const gain = coverageStatus.diff > 0 ? 'gain' : 'drop';
-            coverageSection += `📈 Overall Coverage: ${overall.lines.toFixed(1)}% ${arrow}\n`;
-            coverageSection += `${coverageStatus.diff > 0 ? '🚀' : '⚠️'} ${Math.abs(coverageStatus.diff).toFixed(1)}% ${gain} from baseline\n`;
-        } else {
-            coverageSection += `📊 Overall Coverage: ${overall.lines.toFixed(1)}% (unchanged)\n`;
-        }
-    } else {
-        coverageSection += `📊 **Overall Coverage**: ${overall.lines.toFixed(1)}%\n`;
-    }
-
-    coverageSection += '\n<details>\n<summary>📋 Coverage Details</summary>\n\n';
-
-    if (changedFiles.length > 0) {
-        coverageSection += '| File | Coverage | Lines |\n';
-        coverageSection += '|------|----------|-------|\n';
-
-        changedFiles.forEach((file) => {
-            const displayFile = file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file;
-            coverageSection += `| ${displayFile} | ${file.coverage.toFixed(1)}% | ${file.lines} |\n`;
-        });
-        coverageSection += '\n';
-    } else {
-        coverageSection += '*No changed files with coverage data found.*\n\n';
-    }
-
-    coverageSection += '### Overall Coverage Summary\n';
-
-    const formatMetric = (name, current, base) => {
-        if (!base) {
-            return `- **${name}**: ${current.toFixed(2)}%`;
-        }
-        const diff = current - base;
-        if (Math.abs(diff) < 0.01) {
-            return `- **${name}**: ${current.toFixed(2)}%`;
-        }
-        const sign = diff > 0 ? '+' : '';
-        const emoji = diff > 0 ? '📈' : '📉';
-        return `- **${name}**: ${current.toFixed(2)}% (${emoji} ${sign}${diff.toFixed(2)}%)`;
     };
+    
+    return renderTemplate(coverageTemplate, templateData);
+}
 
-    coverageSection += `${formatMetric('Lines', overall.lines, baseCoverage?.lines)}\n`;
-    coverageSection += `${formatMetric('Statements', overall.statements, baseCoverage?.statements)}\n`;
-    coverageSection += `${formatMetric('Functions', overall.functions, baseCoverage?.functions)}\n`;
-
-    coverageSection += '\n</details>\n\n';
-    coverageSection += `📄 [View Full Coverage Report](${artifactUrl})\n`;
-    coverageSection += `🔗 [View Workflow Run Summary](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${workflowRunId})\n`;
-    coverageSection += `\n${COVERAGE_SECTION_END}`;
-
-    return coverageSection;
+/**
+ * Calculate coverage change with formatting
+ */
+function calculateChange(current, baseline) {
+    const diff = current - baseline;
+    if (Math.abs(diff) < 0.01) {
+        return {
+            text: '→ 0.0%',
+            emoji: '→'
+        };
+    }
+    const arrow = diff > 0 ? '↑' : '↓';
+    const emoji = diff > 0 ? '📈' : '📉';
+    return {
+        text: `${diff > 0 ? '+' : ''}${diff.toFixed(2)}%`,
+        emoji: `${emoji} ${arrow} ${Math.abs(diff).toFixed(1)}%`
+    };
 }
 
 /**
@@ -232,7 +367,7 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
 /**
  * Get coverage report URL - either from direct input or fallback to workflow artifacts
  */
-function getCoverageUrl(coverageUrl, artifactName, workflowRunId) {
+function getCoverageUrl(coverageUrl, workflowRunId) {
     // If we have a direct URL (e.g., from Surge.sh), use it
     if (coverageUrl) {
         return coverageUrl;
@@ -251,7 +386,6 @@ async function run() {
         const octokit = getOctokit(githubToken);
 
         const prNumber = parseInt(core.getInput('PR_NUMBER', {required: true}), 10);
-        const coverageArtifactName = core.getInput('COVERAGE_ARTIFACT_NAME', {required: false}) || 'coverage-report';
         const baseCoveragePath = core.getInput('BASE_COVERAGE_PATH', {required: false});
         const coverageUrl = core.getInput('COVERAGE_URL', {required: false});
         const customTemplatePath = core.getInput('TEMPLATE_PATH', {required: false});
@@ -282,7 +416,7 @@ async function run() {
 
         // Get coverage URL
         const workflowRunId = context.runId.toString();
-        const reportUrl = getCoverageUrl(coverageUrl, coverageArtifactName, workflowRunId);
+        const reportUrl = getCoverageUrl(coverageUrl, workflowRunId);
 
         // Generate coverage section
         const coverageSection = generateCoverageSection(coverageData, reportUrl, workflowRunId, customTemplatePath);

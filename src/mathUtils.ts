@@ -281,3 +281,59 @@ export function distance(x1: number, y1: number, x2: number, y2: number): number
     
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 }
+
+/**
+ * Calculate the median of an array of numbers (UNTESTED)
+ */
+export function median(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate median of empty array');
+    }
+    
+    const sorted = [...numbers].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    
+    if (sorted.length % 2 === 0) {
+        return (sorted[middle - 1] + sorted[middle]) / 2;
+    } else {
+        return sorted[middle];
+    }
+}
+
+/**
+ * Calculate the standard deviation of an array of numbers (UNTESTED)
+ */
+export function standardDeviation(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate standard deviation of empty array');
+    }
+    
+    if (numbers.length === 1) {
+        return 0;
+    }
+    
+    const mean = average(numbers);
+    const squaredDifferences = numbers.map(num => Math.pow(num - mean, 2));
+    const variance = squaredDifferences.reduce((acc, diff) => acc + diff, 0) / (numbers.length - 1);
+    
+    return Math.sqrt(variance);
+}
+
+/**
+ * Check if a year is a leap year (UNTESTED)
+ */
+export function isLeapYear(year: number): boolean {
+    if (year % 4 !== 0) {
+        return false;
+    }
+    
+    if (year % 100 !== 0) {
+        return true;
+    }
+    
+    if (year % 400 === 0) {
+        return true;
+    }
+    
+    return false;
+}
