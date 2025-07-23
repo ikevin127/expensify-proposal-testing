@@ -372,3 +372,29 @@ export function sumOfSquares(n: number): number {
     
     return (n * (n + 1) * (2 * n + 1)) / 6;
 }
+
+/**
+ * Calculate the volume of a sphere (UNTESTED)
+ */
+export function sphereVolume(radius: number): number {
+    if (radius < 0) {
+        throw new Error('Radius cannot be negative');
+    }
+    
+    return (4/3) * Math.PI * Math.pow(radius, 3);
+}
+
+/**
+ * Calculate the nth term of an arithmetic sequence (UNTESTED)
+ */
+export function arithmeticSequence(firstTerm: number, commonDifference: number, n: number): number {
+    if (n <= 0) {
+        throw new Error('Term position must be a positive integer');
+    }
+    
+    if (!Number.isInteger(n)) {
+        throw new Error('Term position must be an integer');
+    }
+    
+    return firstTerm + (n - 1) * commonDifference;
+}
