@@ -147,23 +147,17 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         coverageSection += `📊 **Overall Coverage**: ${overall.lines.toFixed(1)}%\n`;
     }
 
-    // Changed files summary
-    if (changedFiles.length > 0) {
-        const avgChangedCoverage = changedFiles.reduce((sum, file) => sum + file.coverage, 0) / changedFiles.length;
-        coverageSection += `📈 **Changed Files**: ${avgChangedCoverage.toFixed(1)}% average coverage\n`;
-    }
-
     // Details section
     coverageSection += '\n<details>\n<summary>📋 Coverage Details</summary>\n\n';
 
     // Changed files table
     if (changedFiles.length > 0) {
-        coverageSection += '| File | Coverage | Lines | Branches |\n';
-        coverageSection += '|------|----------|-------|---------|\n';
+        coverageSection += '| File | Coverage | Lines |\n';
+        coverageSection += '|------|----------|-------|\n';
 
         changedFiles.forEach((file) => {
             const displayFile = file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file;
-            coverageSection += `| \`${displayFile}\` | ${file.coverage.toFixed(1)}% | ${file.lines} | ${file.branches} |\n`;
+            coverageSection += `| \`${displayFile}\` | ${file.coverage.toFixed(1)}% | ${file.lines} |\n`;
         });
         coverageSection += '\n';
     } else {
@@ -189,7 +183,6 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     coverageSection += `${formatMetric('Lines', overall.lines, baseCoverage?.lines)}\n`;
     coverageSection += `${formatMetric('Statements', overall.statements, baseCoverage?.statements)}\n`;
     coverageSection += `${formatMetric('Functions', overall.functions, baseCoverage?.functions)}\n`;
-    coverageSection += `${formatMetric('Branches', overall.branches, baseCoverage?.branches)}\n`;
 
     // Links section
     coverageSection += '\n</details>\n\n';
