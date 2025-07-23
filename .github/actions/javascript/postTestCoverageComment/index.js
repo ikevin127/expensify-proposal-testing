@@ -31894,9 +31894,47 @@ function getCoverageStatus(current, base) {
 function generateCoverageSection(coverageData, artifactUrl, workflowRunId, customTemplatePath = null) {
     const {overall, changedFiles, baseCoverage} = coverageData;
     
+    // Default template embedded to avoid path resolution issues
+    const defaultTemplate = `### Coverage Summary
+
+{{#hasBaseline}}
+\`\`\`diff
+- 📊 Overall Coverage: {{baseline.lines}}% (baseline)
++ 📊 Overall Coverage: {{current.lines}}% {{diffArrow}} (current PR)
+\`\`\`
+
+{{/hasBaseline}}
+{{#status.hasChange}}
+{{status.emoji}} **{{status.text}}**
+{{#hasBaseline}}
+📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
+{{status.changeEmoji}} {{status.changeText}} from baseline
+{{/hasBaseline}}
+{{/status.hasChange}}
+{{^status.hasChange}}
+{{#hasBaseline}}
+{{status.emoji}} **{{status.text}}**
+📊 Overall Coverage: {{current.lines}}% (unchanged)
+{{/hasBaseline}}
+{{^hasBaseline}}
+📊 **Overall Coverage**: {{current.lines}}%
+{{/hasBaseline}}
+{{/status.hasChange}}
+
+{{#links.coverageReport}}
+📄 [View Full Coverage Report]({{links.coverageReport}})
+{{/links.coverageReport}}
+🔗 [View Workflow Run Summary]({{links.workflowRun}})
+
+<!-- END_COVERAGE_SECTION -->`;
+    
     // Load template
-    const templatePath = customTemplatePath || __nccwpck_require__.ab + "coverageTemplate.md";
-    const template = loadTemplate(templatePath);
+    let template;
+    if (customTemplatePath) {
+        template = loadTemplate(customTemplatePath);
+    } else {
+        template = defaultTemplate;
+    }
     
     // Get coverage status for overall lines coverage
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
