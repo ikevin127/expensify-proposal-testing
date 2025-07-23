@@ -31947,7 +31947,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const processedChangedFiles = changedFiles.map(file => ({
         ...file,
         displayFile: file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file,
-        coverage: file.coverage.toFixed(1),
+        coverage: file.coverage?.toFixed(1) ?? 'N/A',
         branches: file.branches || 'N/A'
     }));
     
@@ -31965,14 +31965,14 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
             lines: overall.lines.toFixed(1),
             functions: overall.functions.toFixed(1),
             statements: overall.statements.toFixed(1),
-            branches: overall.branches.toFixed(1)
+            branches: overall.branches?.toFixed(1)  ?? 'N/A'
         },
         
         baseline: baseCoverage ? {
             lines: baseCoverage.lines.toFixed(2),
             functions: baseCoverage.functions.toFixed(2),
             statements: baseCoverage.statements.toFixed(2),
-            branches: baseCoverage.branches.toFixed(2)
+            branches: baseCoverage.branches?.toFixed(2) ?? 'N/A'
         } : null,
         
         status: {
