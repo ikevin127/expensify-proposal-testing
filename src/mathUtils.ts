@@ -318,3 +318,31 @@ export function isLeapYear(year: number): boolean {
     
     return false;
 }
+
+/**
+ * Calculate the area of a triangle using Heron's formula (UNTESTED)
+ */
+export function triangleArea(a: number, b: number, c: number): number {
+    if (a <= 0 || b <= 0 || c <= 0) {
+        throw new Error('Triangle sides must be positive numbers');
+    }
+    
+    // Check if the sides can form a valid triangle
+    if (a + b <= c || a + c <= b || b + c <= a) {
+        throw new Error('Invalid triangle: sum of any two sides must be greater than the third side');
+    }
+    
+    const s = (a + b + c) / 2; // semi-perimeter
+    return Math.sqrt(s * (s - a) * (s - b) * (s - c));
+}
+
+/**
+ * Convert temperature from Celsius to Fahrenheit (UNTESTED)
+ */
+export function celsiusToFahrenheit(celsius: number): number {
+    if (celsius < -273.15) {
+        throw new Error('Temperature cannot be below absolute zero (-273.15°C)');
+    }
+    
+    return (celsius * 9/5) + 32;
+}
