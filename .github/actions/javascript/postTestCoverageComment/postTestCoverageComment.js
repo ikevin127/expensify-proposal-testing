@@ -3,7 +3,7 @@ import { context, getOctokit } from '@actions/github';
 import fs from 'fs';
 import path from 'path';
 
-const COVERAGE_SECTION_START = '<-- START_COVERAGE_SECTION -->';
+const COVERAGE_SECTION_START = '<!-- START_COVERAGE_SECTION -->';
 const COVERAGE_SECTION_END = '<!-- END_COVERAGE_SECTION -->';
 
 /**
