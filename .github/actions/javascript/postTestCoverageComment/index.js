@@ -31846,6 +31846,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         if (coverageStatus.diff !== 0) {
             const diffPrefix = coverageStatus.diff > 0 ? '+' : '-';
             coverageSection += '```diff\n';
+            coverageSection += '### Coverage Summary\n';
             coverageSection += `${diffPrefix} 📊 Overall Coverage: ${overall.lines.toFixed(2)}% ${coverageStatus.diff > 0 ? '↑' : '↓'} (baseline: ${baseCoverage.lines.toFixed(2)}%)\n`;
             coverageSection += '```\n\n';
         }
@@ -32024,11 +32025,19 @@ async function run() {
         // Update PR body with coverage information
         await updatePRBody(octokit, prNumber, coverageSection);
 
+        // Add coverage information to GitHub Job Summary (displays on workflow run page)
+        await _actions_core__WEBPACK_IMPORTED_MODULE_0__.summary
+            .addHeading(`📊 Test Coverage Report for PR #${prNumber}`, 2)
+            .addRaw(coverageSection)
+            .addSeparator()
+            .addRaw('💡 This summary is also available in the PR description.')
+            .write();
+
         // Set outputs
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('coverage-summary', JSON.stringify(coverageData.overall));
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('coverage-changed', changedFiles.length > 0);
 
-        console.log('Test coverage information added to PR body successfully');
+        console.log('Test coverage information added to PR body and workflow summary successfully');
     } catch (error) {
         console.error('Error in postTestCoverageComment:', error);
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
