@@ -20,8 +20,6 @@ import {
     circleArea,
     circleCircumference,
     randomInt,
-    compoundInterest,
-    distance,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -290,38 +288,6 @@ describe('Math Utils', () => {
 
         test('should throw error when min > max', () => {
             expect(() => randomInt(10, 5)).toThrow('Min cannot be greater than max');
-        });
-    });
-
-    describe('compoundInterest', () => {
-        test('should calculate compound interest', () => {
-            const result = compoundInterest(1000, 0.05, 2);
-            expect(result).toBeCloseTo(1102.5, 2);
-        });
-
-        test('should handle different compounding frequencies', () => {
-            const result = compoundInterest(1000, 0.04, 1, 4);
-            expect(result).toBeCloseTo(1040.6, 1);
-        });
-
-        test('should throw error for invalid parameters', () => {
-            expect(() => compoundInterest(-1000, 0.05, 1)).toThrow('Invalid input parameters');
-            expect(() => compoundInterest(1000, -0.05, 1)).toThrow('Invalid input parameters');
-            expect(() => compoundInterest(1000, 0.05, -1)).toThrow('Invalid input parameters');
-            expect(() => compoundInterest(1000, 0.05, 1, 0)).toThrow('Invalid input parameters');
-        });
-    });
-
-    describe('distance', () => {
-        test('should calculate distance between two points', () => {
-            expect(distance(0, 0, 3, 4)).toBe(5);
-            expect(distance(1, 1, 4, 5)).toBe(5);
-            expect(distance(0, 0, 0, 0)).toBe(0);
-        });
-
-        test('should handle negative coordinates', () => {
-            expect(distance(-3, -4, 0, 0)).toBe(5);
-            expect(distance(0, 0, -3, -4)).toBe(5);
         });
     });
 });

@@ -255,29 +255,3 @@ export function randomInt(min: number, max: number): number {
     
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-/**
- * Calculate compound interest (UNTESTED)
- */
-export function compoundInterest(
-    principal: number,
-    rate: number,
-    time: number,
-    compoundingFrequency: number = 1
-): number {
-    if (principal < 0 || rate < 0 || time < 0 || compoundingFrequency <= 0) {
-        throw new Error('Invalid input parameters');
-    }
-    
-    return principal * Math.pow(1 + rate / compoundingFrequency, compoundingFrequency * time);
-}
-
-/**
- * Calculate the distance between two points (UNTESTED)
- */
-export function distance(x1: number, y1: number, x2: number, y2: number): number {
-    const deltaX = x2 - x1;
-    const deltaY = y2 - y1;
-    
-    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-}
