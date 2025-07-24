@@ -318,3 +318,10 @@ export function isLeapYear(year: number): boolean {
     
     return false;
 }
+
+/**
+ * Multiply two numbers
+ */
+export function multiplyx(a: number, b: number): number {
+    return a * b;
+}
