@@ -31818,9 +31818,14 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
 function renderTemplate(template, data) {
     let result = template;
     
-    // Handle conditional blocks {{#condition}} ... {{/condition}}
-    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, condition, content) => {
-        const value = getNestedValue(data, condition);
+    // Handle array iterations FIRST (before conditional blocks to avoid conflicts)
+    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, arrayName, content) => {
+        const array = getNestedValue(data, arrayName);
+        if (Array.isArray(array)) {
+            return array.map(item => renderTemplate(content, {...data, ...item})).join('');
+        }
+        // If not an array, treat as conditional block
+        const value = getNestedValue(data, arrayName);
         return value ? renderTemplate(content, data) : '';
     });
     
@@ -31828,15 +31833,6 @@ function renderTemplate(template, data) {
     result = result.replace(/\{\{\^([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, condition, content) => {
         const value = getNestedValue(data, condition);
         return !value ? renderTemplate(content, data) : '';
-    });
-    
-    // Handle array iterations {{#array}} ... {{/array}}
-    result = result.replace(/\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, arrayName, content) => {
-        const array = getNestedValue(data, arrayName);
-        if (Array.isArray(array)) {
-            return array.map(item => renderTemplate(content, {...data, ...item})).join('');
-        }
-        return '';
     });
     
     // Handle variable substitutions {{variable}}
