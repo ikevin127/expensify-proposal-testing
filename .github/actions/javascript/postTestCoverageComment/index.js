@@ -31769,6 +31769,7 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
         statements: coverage.total.statements.pct,
         functions: coverage.total.functions.pct,
         lines: coverage.total.lines.pct,
+        branches: coverage.total.branches?.pct,
     };
 
     const changedFilesData = changedFiles
@@ -31804,6 +31805,7 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
             statements: baseCoverage.total.statements.pct,
             functions: baseCoverage.total.functions.pct,
             lines: baseCoverage.total.lines.pct,
+            branches: baseCoverage.total.branches,
         };
     }
 
@@ -31862,75 +31864,72 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const {overall, changedFiles, baseCoverage} = coverageData;
     
     // Local template for easy editing
-    const coverageTemplate = `
-    ### 🧪 Test Coverage Report
+    const coverageTemplate = `### 🧪 Test Coverage Report
 
-    {{#hasBaseline}}
-    {{#status.hasChange}}
-    \`\`\`diff
-    {{#status.isIncrease}}
-    + 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
-    {{/status.isIncrease}}
-    {{#status.isDecrease}}
-    - 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
-    {{/status.isDecrease}}
-    \`\`\`
+{{#hasBaseline}}
+{{#status.hasChange}}
+\`\`\`diff
+{{#status.isIncrease}}
++ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
+{{/status.isIncrease}}
+{{#status.isDecrease}}
+- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
+{{/status.isDecrease}}
+\`\`\`
 
-    {{/status.hasChange}}
-    {{/hasBaseline}}
+{{/status.hasChange}}
+{{/hasBaseline}}
 
-    {{#status.hasChange}}
-    {{status.emoji}} **{{status.text}}**
-    {{#hasBaseline}}
-    📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
-    {{status.changeEmoji}} {{status.changeText}} from baseline
-    {{/hasBaseline}}
-    {{/status.hasChange}}
-    {{^status.hasChange}}
-    {{#hasBaseline}}
-    {{status.emoji}} **{{status.text}}**
-    📊 Overall Coverage: {{current.lines}}% (unchanged)
-    {{/hasBaseline}}
-    {{^hasBaseline}}
-    📊 **Overall Coverage**: {{current.lines}}%
-    {{/hasBaseline}}
-    {{/status.hasChange}}
+{{#status.hasChange}}
+{{status.emoji}} **{{status.text}}**
+{{#hasBaseline}}
+📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
+{{status.changeEmoji}} {{status.changeText}} from baseline
+{{/hasBaseline}}
+{{/status.hasChange}}
+{{^status.hasChange}}
+{{#hasBaseline}}
+{{status.emoji}} **{{status.text}}**
+📊 Overall Coverage: {{current.lines}}% (unchanged)
+{{/hasBaseline}}
+{{^hasBaseline}}
+📊 **Overall Coverage**: {{current.lines}}%
+{{/hasBaseline}}
+{{/status.hasChange}}
 
-    <details>
-    <summary>📋 Coverage Details</summary>
+<details>
+<summary>📋 Coverage Details</summary>
 
-    {{#hasChangedFiles}}
-    | File | Coverage | Lines |
-    |------|----------|-------|
-    {{#changedFiles}}
-    | {{displayFile}} | {{coverage}}% | {{lines}} |
-    {{/changedFiles}}
+{{#hasChangedFiles}}
+| File | Coverage | Lines |
+|------|----------|-------|
+{{#changedFiles}}
+| {{displayFile}} | {{coverage}}% | {{lines}} |
+{{/changedFiles}}
 
-    {{/hasChangedFiles}}
-    {{^hasChangedFiles}}
-    *No changed files with coverage data found.*
+{{/hasChangedFiles}}
+{{^hasChangedFiles}}
+*No changed files with coverage data found.*
 
-    {{/hasChangedFiles}}
-    ### Overall Coverage Summary
-    {{#hasBaseline}}
-    - **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
-    - **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
-    - **Functions**: {{current.functions}}% ({{changes.functions.emoji}} {{changes.functions.text}})
-    - **Branches**: {{current.branches}}% ({{changes.branches.emoji}} {{changes.branches.text}})
-    {{/hasBaseline}}
-    {{^hasBaseline}}
-    - **Lines**: {{current.lines}}%
-    - **Statements**: {{current.statements}}%
-    - **Functions**: {{current.functions}}%
-    - **Branches**: {{current.branches}}%
-    {{/hasBaseline}}
+{{/hasChangedFiles}}
+### Overall Coverage Summary
+{{#hasBaseline}}
+- **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
+- **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
+- **Functions**: {{current.functions}}% ({{changes.functions.emoji}} {{changes.functions.text}})
+{{/hasBaseline}}
+{{^hasBaseline}}
+- **Lines**: {{current.lines}}%
+- **Statements**: {{current.statements}}%
+- **Functions**: {{current.functions}}%
+{{/hasBaseline}}
 
-    </details>
+</details>
 
-    📄 [View Full Coverage Report]({{links.coverageReport}})
-    🔗 [View Workflow Run Summary]({{links.workflowRun}})
+📄 [View Full Coverage Report]({{links.coverageReport}})
+🔗 [View Workflow Run Summary]({{links.workflowRun}})
 
-    <!-- END_COVERAGE_SECTION -->`;
+<!-- END_COVERAGE_SECTION -->`;
     
     // Get coverage status for overall lines coverage
     const coverageStatus = getCoverageStatus(overall.lines, baseCoverage?.lines);
@@ -31940,15 +31939,13 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         lines: calculateChange(overall.lines, baseCoverage.lines),
         statements: calculateChange(overall.statements, baseCoverage.statements),
         functions: calculateChange(overall.functions, baseCoverage.functions),
-        branches: calculateChange(overall.branches, baseCoverage.branches)
     } : {};
     
     // Process changed files for template
     const processedChangedFiles = changedFiles.map(file => ({
         ...file,
         displayFile: file.file.length > 50 ? `...${file.file.slice(-47)}` : file.file,
-        coverage: file.coverage.toFixed(1),
-        branches: file.branches || 'N/A'
+        coverage: file.coverage != null ? file.coverage.toFixed(1) : '0.0',
     }));
     
     const avgChangedCoverage = changedFiles.length > 0 
@@ -31962,17 +31959,15 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         avgChangedCoverage,
         
         current: {
-            lines: overall.lines.toFixed(1),
-            functions: overall.functions.toFixed(1),
-            statements: overall.statements.toFixed(1),
-            branches: overall.branches.toFixed(1)
+            lines: overall.lines?.toFixed(1),
+            functions: overall.functions?.toFixed(1),
+            statements: overall.statements?.toFixed(1),
         },
         
         baseline: baseCoverage ? {
-            lines: baseCoverage.lines.toFixed(2),
-            functions: baseCoverage.functions.toFixed(2),
-            statements: baseCoverage.statements.toFixed(2),
-            branches: baseCoverage.branches.toFixed(2)
+            lines: baseCoverage.lines?.toFixed(2),
+            functions: baseCoverage.functions?.toFixed(2),
+            statements: baseCoverage.statements?.toFixed(2),
         } : null,
         
         status: {
@@ -31983,7 +31978,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
             isDecrease: coverageStatus.diff < 0,
             arrow: coverageStatus.diff > 0 ? '↑' : '↓',
             changeEmoji: coverageStatus.diff > 0 ? '🚀' : '⚠️',
-            changeText: `${Math.abs(coverageStatus.diff).toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
+            changeText: `${Math.abs(coverageStatus.diff)?.toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
         },
         
         changes,
@@ -32012,8 +32007,8 @@ function calculateChange(current, baseline) {
     const arrow = diff > 0 ? '↑' : '↓';
     const emoji = diff > 0 ? '📈' : '📉';
     return {
-        text: `${diff > 0 ? '+' : ''}${diff.toFixed(2)}%`,
-        emoji: `${emoji} ${arrow} ${Math.abs(diff).toFixed(1)}%`
+        text: `${diff > 0 ? '+' : ''}${diff?.toFixed(2)}%`,
+        emoji: `${emoji} ${arrow} ${Math.abs(diff)?.toFixed(1)}%`
     };
 }
 
