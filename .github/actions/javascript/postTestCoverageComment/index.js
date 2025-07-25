@@ -31887,8 +31887,8 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{/status.hasChange}}
 
 <details>
-<summary>📋 Coverage Details</summary>
-
+<summary><strong>📋 Coverage Details</strong></summary>
+<br>
 {{#hasChangedFiles}}
 | File | Coverage | Lines |
 |------|----------|-------|
@@ -31896,9 +31896,9 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{/changedFiles}}
 {{/hasChangedFiles}}
 {{^hasChangedFiles}}
-*No changed files with coverage data were found.*
+*No coverage changed files found.*
 {{/hasChangedFiles}}
-### Overall Coverage Summary
+**🔄 Overall Coverage Summary**
 {{#hasBaseline}}
 - **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
 - **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
@@ -31986,8 +31986,8 @@ function calculateChange(current, baseline) {
     const diff = current - baseline;
     if (Math.abs(diff) < 0.01) {
         return {
-            text: '→ 0.0%',
-            emoji: '→'
+            text: '0.0%',
+            emoji: ''
         };
     }
     const arrow = diff > 0 ? '↑' : '↓';
