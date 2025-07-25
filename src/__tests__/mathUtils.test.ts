@@ -27,6 +27,7 @@ import {
     percentageChange,
     isPalindrome,
     clamp,
+    round,
 } from '../mathUtils';
 
 describe('Math Utils', () => {

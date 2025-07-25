@@ -348,12 +348,25 @@ export function isPalindrome(n: number): boolean {
 }
 
 /**
- * Clamp a number between a minimum and maximum value
+ * Clamps a number between a specified minimum and maximum value
  */
 export function clamp(value: number, min: number, max: number): number {
     if (min > max) {
         throw new Error('Minimum value cannot be greater than maximum value');
     }
-    
     return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Rounds a number to a specified number of decimal places
+ */
+export function round(value: number, decimals: number = 0): number {
+    if (decimals < 0) {
+        throw new Error('Number of decimal places cannot be negative');
+    }
+    if (!Number.isInteger(decimals)) {
+        throw new Error('Number of decimal places must be an integer');
+    }
+    const multiplier = Math.pow(10, decimals);
+    return Math.round(value * multiplier) / multiplier;
 }
