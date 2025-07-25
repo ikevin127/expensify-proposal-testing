@@ -318,3 +318,31 @@ export function isLeapYear(year: number): boolean {
     
     return false;
 }
+
+/**
+ * Calculate the percentage change between two values
+ */
+export function percentageChange(oldValue: number, newValue: number): number {
+    if (oldValue === 0) {
+        if (newValue === 0) {
+            return 0;
+        }
+        return newValue > 0 ? Infinity : -Infinity;
+    }
+    
+    return ((newValue - oldValue) / Math.abs(oldValue)) * 100;
+}
+
+/**
+ * Check if a number is a palindrome
+ */
+export function isPalindrome(n: number): boolean {
+    if (n < 0) {
+        return false;
+    }
+    
+    const str = n.toString();
+    const reversed = str.split('').reverse().join('');
+    
+    return str === reversed;
+}
