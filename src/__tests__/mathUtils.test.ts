@@ -27,7 +27,7 @@ import {
     percentageChange,
     isPalindrome,
     clamp,
-    round,
+    fibonacciNumber,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -550,6 +550,53 @@ describe('Math Utils', () => {
             expect(clamp(1000000, 0, 999999)).toBe(999999);
             expect(clamp(-1000000, -999999, 0)).toBe(-999999);
             expect(clamp(500000, 0, 1000000)).toBe(500000);
+        });
+    });
+
+    describe('fibonacciNumber', () => {
+        test('should return correct fibonacci numbers for small values', () => {
+            expect(fibonacciNumber(0)).toBe(0);
+            expect(fibonacciNumber(1)).toBe(1);
+            expect(fibonacciNumber(2)).toBe(1);
+            expect(fibonacciNumber(3)).toBe(2);
+            expect(fibonacciNumber(4)).toBe(3);
+            expect(fibonacciNumber(5)).toBe(5);
+            expect(fibonacciNumber(6)).toBe(8);
+            expect(fibonacciNumber(7)).toBe(13);
+        });
+
+        test('should return correct fibonacci numbers for larger values', () => {
+            expect(fibonacciNumber(10)).toBe(55);
+            expect(fibonacciNumber(15)).toBe(610);
+            expect(fibonacciNumber(20)).toBe(6765);
+        });
+
+        test('should handle edge cases', () => {
+            expect(fibonacciNumber(8)).toBe(21);
+            expect(fibonacciNumber(9)).toBe(34);
+            expect(fibonacciNumber(12)).toBe(144);
+        });
+
+        test('should throw error for negative numbers', () => {
+            expect(() => fibonacciNumber(-1)).toThrow('Fibonacci number is not defined for negative numbers');
+            expect(() => fibonacciNumber(-5)).toThrow('Fibonacci number is not defined for negative numbers');
+            expect(() => fibonacciNumber(-10)).toThrow('Fibonacci number is not defined for negative numbers');
+        });
+
+        test('should be efficient for moderate values', () => {
+            // Test that it can handle moderately large values efficiently
+            expect(fibonacciNumber(30)).toBe(832040);
+            expect(fibonacciNumber(25)).toBe(75025);
+        });
+
+        test('should maintain accuracy for sequence validation', () => {
+            // Validate that consecutive fibonacci numbers follow the rule: F(n) = F(n-1) + F(n-2)
+            const f10 = fibonacciNumber(10);
+            const f11 = fibonacciNumber(11);
+            const f12 = fibonacciNumber(12);
+            
+            expect(f12).toBe(f10 + f11);
+            expect(f11).toBe(fibonacciNumber(9) + f10);
         });
     });
 });

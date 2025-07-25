@@ -370,3 +370,57 @@ export function round(value: number, decimals: number = 0): number {
     const multiplier = Math.pow(10, decimals);
     return Math.round(value * multiplier) / multiplier;
 }
+
+/**
+ * Calculate the nth Fibonacci number (optimized iterative approach)
+ */
+export function fibonacciNumber(n: number): number {
+    if (n < 0) {
+        throw new Error('Fibonacci number is not defined for negative numbers');
+    }
+    
+    if (n === 0) {
+        return 0;
+    }
+    
+    if (n === 1) {
+        return 1;
+    }
+    
+    let prev = 0;
+    let curr = 1;
+    
+    for (let i = 2; i <= n; i++) {
+        const next = prev + curr;
+        prev = curr;
+        curr = next;
+    }
+    
+    return curr;
+}
+
+/**
+ * Calculate the slope of a line given two points
+ */
+export function slope(x1: number, y1: number, x2: number, y2: number): number {
+    if (x1 === x2) {
+        throw new Error('Cannot calculate slope for vertical line (undefined slope)');
+    }
+    
+    return (y2 - y1) / (x2 - x1);
+}
+
+/**
+ * Calculate the hypotenuse of a right triangle given two sides
+ */
+export function hypotenuse(a: number, b: number): number {
+    if (a < 0 || b < 0) {
+        throw new Error('Side lengths cannot be negative');
+    }
+    
+    if (a === 0 && b === 0) {
+        return 0;
+    }
+    
+    return Math.sqrt(a * a + b * b);
+}
