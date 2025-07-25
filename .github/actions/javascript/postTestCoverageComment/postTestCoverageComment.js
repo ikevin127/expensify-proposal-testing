@@ -150,11 +150,9 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{#hasBaseline}}
 {{#status.hasChange}}
 \`\`\`diff
-{{#status.isIncrease}}
-+ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
+{{#status.isIncrease}}+ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
 {{/status.isIncrease}}
-{{#status.isDecrease}}
-- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
+{{#status.isDecrease}}- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
 {{/status.isDecrease}}
 \`\`\`
 
