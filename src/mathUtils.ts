@@ -370,3 +370,120 @@ export function round(value: number, decimals: number = 0): number {
     const multiplier = Math.pow(10, decimals);
     return Math.round(value * multiplier) / multiplier;
 }
+
+/**
+ * Calculate the nth Fibonacci number (optimized iterative approach)
+ */
+export function fibonacciNumber(n: number): number {
+    if (n < 0) {
+        throw new Error('Fibonacci number is not defined for negative numbers');
+    }
+    
+    if (n === 0) {
+        return 0;
+    }
+    
+    if (n === 1) {
+        return 1;
+    }
+    
+    let prev = 0;
+    let curr = 1;
+    
+    for (let i = 2; i <= n; i++) {
+        const next = prev + curr;
+        prev = curr;
+        curr = next;
+    }
+    
+    return curr;
+}
+
+/**
+ * Calculate the slope of a line given two points
+ */
+export function slope(x1: number, y1: number, x2: number, y2: number): number {
+    if (x1 === x2) {
+        throw new Error('Cannot calculate slope for vertical line (undefined slope)');
+    }
+    
+    return (y2 - y1) / (x2 - x1);
+}
+
+/**
+ * Calculate the hypotenuse of a right triangle given two sides
+ */
+export function hypotenuse(a: number, b: number): number {
+    if (a < 0 || b < 0) {
+        throw new Error('Side lengths cannot be negative');
+    }
+    
+    if (a === 0 && b === 0) {
+        return 0;
+    }
+    
+    return Math.sqrt(a * a + b * b);
+}
+
+/**
+ * Calculate the area of a triangle using Heron's formula
+ */
+export function triangleArea(a: number, b: number, c: number): number {
+    if (a <= 0 || b <= 0 || c <= 0) {
+        throw new Error('All side lengths must be positive');
+    }
+    
+    // Check triangle inequality
+    if (a + b <= c || a + c <= b || b + c <= a) {
+        throw new Error('Invalid triangle: sides do not satisfy triangle inequality');
+    }
+    
+    const s = (a + b + c) / 2; // semi-perimeter
+    const area = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+    
+    return area;
+}
+
+/**
+ * Convert a number from one base to another (up to base 36)
+ */
+export function convertBase(number: string, fromBase: number, toBase: number): string {
+    if (fromBase < 2 || fromBase > 36 || toBase < 2 || toBase > 36) {
+        throw new Error('Base must be between 2 and 36');
+    }
+    
+    if (!number || number.trim() === '') {
+        throw new Error('Number string cannot be empty');
+    }
+    
+    // Convert from source base to decimal
+    const decimal = parseInt(number, fromBase);
+    
+    if (isNaN(decimal)) {
+        throw new Error('Invalid number for the specified base');
+    }
+    
+    // Convert from decimal to target base
+    return decimal.toString(toBase).toUpperCase();
+}
+
+/**
+ * Calculate the sum of digits in a number
+ */
+export function digitSum(n: number): number {
+    if (n < 0) {
+        n = Math.abs(n); // Work with absolute value for negative numbers
+    }
+    
+    if (n === 0) {
+        return 0;
+    }
+    
+    let sum = 0;
+    while (n > 0) {
+        sum += n % 10;
+        n = Math.floor(n / 10);
+    }
+    
+    return sum;
+}
