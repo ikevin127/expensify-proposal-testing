@@ -31865,31 +31865,20 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{#hasBaseline}}
 {{#status.hasChange}}
 \`\`\`diff
-{{#status.isIncrease}}+ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%)
-{{/status.isIncrease}}
-{{#status.isDecrease}}- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%)
-{{/status.isDecrease}}
+{{#status.isIncrease}}+ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%){{/status.isIncrease}}{{#status.isDecrease}}- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%){{/status.isDecrease}}
 \`\`\`
 
-{{/status.hasChange}}
-{{/hasBaseline}}
-
-{{#status.hasChange}}
 {{status.emoji}} **{{status.text}}**
-{{#hasBaseline}}
-📈 Overall Coverage: {{current.lines}}% {{status.arrow}}
+{{#status.isIncrease}}📈{{/status.isIncrease}}{{#status.isDecrease}}📉{{/status.isDecrease}} Overall Coverage: {{current.lines}}% {{status.arrow}}
 {{status.changeEmoji}} {{status.changeText}} from baseline
-{{/hasBaseline}}
 {{/status.hasChange}}
 {{^status.hasChange}}
-{{#hasBaseline}}
-{{status.emoji}} **{{status.text}}**
 📊 Overall Coverage: {{current.lines}}% (unchanged)
+{{/status.hasChange}}
 {{/hasBaseline}}
 {{^hasBaseline}}
 📊 **Overall Coverage**: {{current.lines}}%
 {{/hasBaseline}}
-{{/status.hasChange}}
 
 <details>
 <summary>📋 Coverage Details</summary>
