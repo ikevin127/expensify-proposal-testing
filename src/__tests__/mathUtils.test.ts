@@ -26,6 +26,7 @@ import {
     isLeapYear,
     percentageChange,
     isPalindrome,
+    clamp,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -490,6 +491,64 @@ describe('Math Utils', () => {
             expect(isPalindrome(100)).toBe(false);
             expect(isPalindrome(1000)).toBe(false);
             expect(isPalindrome(101)).toBe(true);
+        });
+    });
+
+    describe('clamp', () => {
+        test('should return the value when it is within the range', () => {
+            expect(clamp(5, 0, 10)).toBe(5);
+            expect(clamp(7.5, 5, 10)).toBe(7.5);
+            expect(clamp(-2, -5, 5)).toBe(-2);
+        });
+
+        test('should return the minimum when value is below range', () => {
+            expect(clamp(-5, 0, 10)).toBe(0);
+            expect(clamp(2, 5, 10)).toBe(5);
+            expect(clamp(-10, -5, 5)).toBe(-5);
+        });
+
+        test('should return the maximum when value is above range', () => {
+            expect(clamp(15, 0, 10)).toBe(10);
+            expect(clamp(12, 5, 10)).toBe(10);
+            expect(clamp(10, -5, 5)).toBe(5);
+        });
+
+        test('should handle edge cases at boundaries', () => {
+            expect(clamp(0, 0, 10)).toBe(0);  // At minimum
+            expect(clamp(10, 0, 10)).toBe(10); // At maximum
+            expect(clamp(5, 5, 5)).toBe(5);    // Min equals max equals value
+        });
+
+        test('should handle negative ranges', () => {
+            expect(clamp(-3, -10, -1)).toBe(-3);
+            expect(clamp(-15, -10, -1)).toBe(-10);
+            expect(clamp(0, -10, -1)).toBe(-1);
+        });
+
+        test('should handle decimal values', () => {
+            expect(clamp(2.5, 0, 5)).toBe(2.5);
+            expect(clamp(-0.5, 0, 5)).toBe(0);
+            expect(clamp(7.8, 0, 5)).toBe(5);
+            expect(clamp(3.14159, 3.14, 3.15)).toBeCloseTo(3.14159, 5);
+        });
+
+        test('should handle zero as min or max', () => {
+            expect(clamp(5, 0, 10)).toBe(5);
+            expect(clamp(-5, -10, 0)).toBe(-5);
+            expect(clamp(1, 0, 0)).toBe(0);
+            expect(clamp(-1, 0, 0)).toBe(0);
+        });
+
+        test('should throw error when min is greater than max', () => {
+            expect(() => clamp(5, 10, 5)).toThrow('Minimum value cannot be greater than maximum value');
+            expect(() => clamp(0, 1, -1)).toThrow('Minimum value cannot be greater than maximum value');
+            expect(() => clamp(-5, 0, -10)).toThrow('Minimum value cannot be greater than maximum value');
+        });
+
+        test('should handle very large numbers', () => {
+            expect(clamp(1000000, 0, 999999)).toBe(999999);
+            expect(clamp(-1000000, -999999, 0)).toBe(-999999);
+            expect(clamp(500000, 0, 1000000)).toBe(500000);
         });
     });
 });
