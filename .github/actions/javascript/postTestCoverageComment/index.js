@@ -31867,18 +31867,24 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 \`\`\`diff
 {{#status.isIncrease}}+ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%){{/status.isIncrease}}{{#status.isDecrease}}- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%){{/status.isDecrease}}
 \`\`\`
+{{/status.hasChange}}
+{{/hasBaseline}}
 
+{{#status.hasChange}}
 {{status.emoji}} **{{status.text}}**
+{{#hasBaseline}}
 {{#status.isIncrease}}📈{{/status.isIncrease}}{{#status.isDecrease}}📉{{/status.isDecrease}} Overall Coverage: {{current.lines}}% {{status.arrow}}
 {{status.changeEmoji}} {{status.changeText}} from baseline
+{{/hasBaseline}}
 {{/status.hasChange}}
 {{^status.hasChange}}
+{{#hasBaseline}}
 📊 Overall Coverage: {{current.lines}}% (unchanged)
-{{/status.hasChange}}
 {{/hasBaseline}}
 {{^hasBaseline}}
 📊 **Overall Coverage**: {{current.lines}}%
 {{/hasBaseline}}
+{{/status.hasChange}}
 
 <details>
 <summary>📋 Coverage Details</summary>
@@ -31890,8 +31896,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{/changedFiles}}
 {{/hasChangedFiles}}
 {{^hasChangedFiles}}
-*No changed files with coverage data found.*
-
+*No changed files with coverage data were found.*
 {{/hasChangedFiles}}
 ### Overall Coverage Summary
 {{#hasBaseline}}
