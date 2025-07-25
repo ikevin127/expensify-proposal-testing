@@ -127,7 +127,7 @@ export function power(base: number, exponent: number): number {
 }
 
 /**
- * Calculate the square root using Newton's method (UNTESTED)
+ * Calculate the square root using Newton's method
  */
 export function sqrt(n: number): number {
     if (n < 0) {
@@ -150,7 +150,7 @@ export function sqrt(n: number): number {
 }
 
 /**
- * Calculate the greatest common divisor (UNTESTED)
+ * Calculate the greatest common divisor
  */
 export function gcd(a: number, b: number): number {
     a = Math.abs(a);
@@ -166,7 +166,7 @@ export function gcd(a: number, b: number): number {
 }
 
 /**
- * Calculate the least common multiple (UNTESTED)
+ * Calculate the least common multiple
  */
 export function lcm(a: number, b: number): number {
     if (a === 0 || b === 0) {
@@ -177,7 +177,7 @@ export function lcm(a: number, b: number): number {
 }
 
 /**
- * Generate Fibonacci sequence up to n terms (UNTESTED)
+ * Generate Fibonacci sequence up to n terms
  */
 export function fibonacci(n: number): number[] {
     if (n <= 0) {
@@ -198,7 +198,7 @@ export function fibonacci(n: number): number[] {
 }
 
 /**
- * Check if a number is a perfect square (UNTESTED)
+ * Check if a number is a perfect square
  */
 export function isPerfectSquare(n: number): boolean {
     if (n < 0) {
@@ -210,21 +210,21 @@ export function isPerfectSquare(n: number): boolean {
 }
 
 /**
- * Convert degrees to radians (UNTESTED)
+ * Convert degrees to radians
  */
 export function degreesToRadians(degrees: number): number {
     return degrees * (Math.PI / 180);
 }
 
 /**
- * Convert radians to degrees (UNTESTED)
+ * Convert radians to degrees
  */
 export function radiansToDegrees(radians: number): number {
     return radians * (180 / Math.PI);
 }
 
 /**
- * Calculate the area of a circle (UNTESTED)
+ * Calculate the area of a circle
  */
 export function circleArea(radius: number): number {
     if (radius < 0) {
@@ -235,7 +235,7 @@ export function circleArea(radius: number): number {
 }
 
 /**
- * Calculate the circumference of a circle (UNTESTED)
+ * Calculate the circumference of a circle
  */
 export function circleCircumference(radius: number): number {
     if (radius < 0) {
@@ -246,7 +246,7 @@ export function circleCircumference(radius: number): number {
 }
 
 /**
- * Generate a random integer between min and max (inclusive) (UNTESTED)
+ * Generate a random integer between min and max (inclusive)
  */
 export function randomInt(min: number, max: number): number {
     if (min > max) {
@@ -257,7 +257,7 @@ export function randomInt(min: number, max: number): number {
 }
 
 /**
- * Calculate compound interest (UNTESTED)
+ * Calculate compound interest
  */
 export function compoundInterest(
     principal: number,
@@ -273,7 +273,7 @@ export function compoundInterest(
 }
 
 /**
- * Calculate the distance between two points (UNTESTED)
+ * Calculate the distance between two points
  */
 export function distance(x1: number, y1: number, x2: number, y2: number): number {
     const deltaX = x2 - x1;
@@ -283,7 +283,7 @@ export function distance(x1: number, y1: number, x2: number, y2: number): number
 }
 
 /**
- * Calculate the median of an array of numbers (UNTESTED)
+ * Calculate the median of an array of numbers
  */
 export function median(numbers: number[]): number {
     if (numbers.length === 0) {
@@ -301,7 +301,7 @@ export function median(numbers: number[]): number {
 }
 
 /**
- * Check if a year is a leap year (UNTESTED)
+ * Check if a year is a leap year
  */
 export function isLeapYear(year: number): boolean {
     if (year % 4 !== 0) {

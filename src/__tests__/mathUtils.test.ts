@@ -22,6 +22,8 @@ import {
     randomInt,
     compoundInterest,
     distance,
+    median,
+    isLeapYear,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -322,6 +324,76 @@ describe('Math Utils', () => {
         test('should handle negative coordinates', () => {
             expect(distance(-3, -4, 0, 0)).toBe(5);
             expect(distance(0, 0, -3, -4)).toBe(5);
+        });
+    });
+
+    describe('median', () => {
+        test('should calculate median for odd-length arrays', () => {
+            expect(median([1, 3, 5])).toBe(3);
+            expect(median([7, 2, 9, 1, 5])).toBe(5);
+            expect(median([10])).toBe(10);
+        });
+
+        test('should calculate median for even-length arrays', () => {
+            expect(median([1, 2, 3, 4])).toBe(2.5);
+            expect(median([10, 20])).toBe(15);
+            expect(median([1, 3, 5, 7])).toBe(4);
+        });
+
+        test('should handle unsorted arrays', () => {
+            expect(median([5, 1, 9, 3, 7])).toBe(5);
+            expect(median([8, 2, 10, 4, 6, 12])).toBe(7);
+        });
+
+        test('should handle arrays with duplicate values', () => {
+            expect(median([1, 1, 1])).toBe(1);
+            expect(median([2, 2, 3, 3])).toBe(2.5);
+            expect(median([5, 1, 5, 1, 5])).toBe(5);
+        });
+
+        test('should handle negative numbers', () => {
+            expect(median([-1, -3, -5])).toBe(-3);
+            expect(median([-10, 5, 0, -2])).toBe(-1);
+        });
+
+        test('should throw error for empty array', () => {
+            expect(() => median([])).toThrow('Cannot calculate median of empty array');
+        });
+    });
+
+    describe('isLeapYear', () => {
+        test('should return true for leap years divisible by 4 but not 100', () => {
+            expect(isLeapYear(2020)).toBe(true);
+            expect(isLeapYear(2024)).toBe(true);
+            expect(isLeapYear(2028)).toBe(true);
+            expect(isLeapYear(1996)).toBe(true);
+        });
+
+        test('should return false for non-leap years not divisible by 4', () => {
+            expect(isLeapYear(2021)).toBe(false);
+            expect(isLeapYear(2022)).toBe(false);
+            expect(isLeapYear(2023)).toBe(false);
+            expect(isLeapYear(1999)).toBe(false);
+        });
+
+        test('should return false for years divisible by 100 but not 400', () => {
+            expect(isLeapYear(1700)).toBe(false);
+            expect(isLeapYear(1800)).toBe(false);
+            expect(isLeapYear(1900)).toBe(false);
+            expect(isLeapYear(2100)).toBe(false);
+        });
+
+        test('should return true for years divisible by 400', () => {
+            expect(isLeapYear(1600)).toBe(true);
+            expect(isLeapYear(2000)).toBe(true);
+            expect(isLeapYear(2400)).toBe(true);
+        });
+
+        test('should handle edge cases', () => {
+            expect(isLeapYear(4)).toBe(true);
+            expect(isLeapYear(100)).toBe(false);
+            expect(isLeapYear(400)).toBe(true);
+            expect(isLeapYear(0)).toBe(true); // Year 0 is divisible by 400
         });
     });
 });
