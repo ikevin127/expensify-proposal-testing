@@ -24,6 +24,8 @@ import {
     distance,
     median,
     isLeapYear,
+    percentageChange,
+    isPalindrome,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -394,6 +396,100 @@ describe('Math Utils', () => {
             expect(isLeapYear(100)).toBe(false);
             expect(isLeapYear(400)).toBe(true);
             expect(isLeapYear(0)).toBe(true); // Year 0 is divisible by 400
+        });
+    });
+
+    describe('percentageChange', () => {
+        test('should calculate positive percentage change', () => {
+            expect(percentageChange(100, 150)).toBe(50);
+            expect(percentageChange(50, 75)).toBe(50);
+            expect(percentageChange(200, 250)).toBe(25);
+        });
+
+        test('should calculate negative percentage change', () => {
+            expect(percentageChange(100, 75)).toBe(-25);
+            expect(percentageChange(200, 150)).toBe(-25);
+            expect(percentageChange(50, 25)).toBe(-50);
+        });
+
+        test('should handle zero change', () => {
+            expect(percentageChange(100, 100)).toBe(0);
+            expect(percentageChange(50, 50)).toBe(0);
+            expect(percentageChange(-10, -10)).toBe(0);
+        });
+
+        test('should handle negative old values', () => {
+            expect(percentageChange(-100, -50)).toBe(50);
+            expect(percentageChange(-50, -75)).toBe(-50);
+            expect(percentageChange(-10, 10)).toBe(200);
+        });
+
+        test('should handle mixed positive/negative values', () => {
+            expect(percentageChange(100, -50)).toBe(-150);
+            expect(percentageChange(-100, 50)).toBe(150);
+        });
+
+        test('should handle zero old value', () => {
+            expect(percentageChange(0, 0)).toBe(0);
+            expect(percentageChange(0, 100)).toBe(Infinity);
+            expect(percentageChange(0, -100)).toBe(-Infinity);
+        });
+
+        test('should handle decimal values', () => {
+            expect(percentageChange(10.5, 12.6)).toBeCloseTo(20, 1);
+            expect(percentageChange(3.33, 6.66)).toBeCloseTo(100, 1);
+        });
+    });
+
+    describe('isPalindrome', () => {
+        test('should return true for single digit numbers', () => {
+            expect(isPalindrome(0)).toBe(true);
+            expect(isPalindrome(1)).toBe(true);
+            expect(isPalindrome(5)).toBe(true);
+            expect(isPalindrome(9)).toBe(true);
+        });
+
+        test('should return true for palindromic numbers', () => {
+            expect(isPalindrome(11)).toBe(true);
+            expect(isPalindrome(121)).toBe(true);
+            expect(isPalindrome(1221)).toBe(true);
+            expect(isPalindrome(12321)).toBe(true);
+            expect(isPalindrome(123321)).toBe(true);
+        });
+
+        test('should return false for non-palindromic numbers', () => {
+            expect(isPalindrome(12)).toBe(false);
+            expect(isPalindrome(123)).toBe(false);
+            expect(isPalindrome(1234)).toBe(false);
+            expect(isPalindrome(12345)).toBe(false);
+        });
+
+        test('should handle larger palindromic numbers', () => {
+            expect(isPalindrome(1234321)).toBe(true);
+            expect(isPalindrome(9876789)).toBe(true);
+            expect(isPalindrome(1001)).toBe(true);
+            expect(isPalindrome(90109)).toBe(true);
+        });
+
+        test('should handle larger non-palindromic numbers', () => {
+            expect(isPalindrome(1234567)).toBe(false);
+            expect(isPalindrome(9876543)).toBe(false);
+            expect(isPalindrome(1002)).toBe(false);
+            expect(isPalindrome(90108)).toBe(false);
+        });
+
+        test('should return false for negative numbers', () => {
+            expect(isPalindrome(-1)).toBe(false);
+            expect(isPalindrome(-11)).toBe(false);
+            expect(isPalindrome(-121)).toBe(false);
+            expect(isPalindrome(-12321)).toBe(false);
+        });
+
+        test('should handle numbers with trailing zeros', () => {
+            expect(isPalindrome(10)).toBe(false);
+            expect(isPalindrome(100)).toBe(false);
+            expect(isPalindrome(1000)).toBe(false);
+            expect(isPalindrome(101)).toBe(true);
         });
     });
 });
