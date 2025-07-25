@@ -709,7 +709,7 @@ describe('Math Utils', () => {
 
         test('should handle edge case triangles', () => {
             // Very flat triangle
-            expect(triangleArea(5, 5, 9.9)).toBeCloseTo(2.45, 1);
+            expect(triangleArea(5, 5, 9.9)).toBeCloseTo(3.49, 2);
             // Large triangle
             expect(triangleArea(13, 14, 15)).toBe(84);
         });
