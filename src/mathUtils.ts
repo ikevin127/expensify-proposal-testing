@@ -358,7 +358,7 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * Rounds a number to a specified number of decimal places
+ * Rounds a number to a specified number of decimal place
  */
 export function round(value: number, decimals: number = 0): number {
     if (decimals < 0) {
