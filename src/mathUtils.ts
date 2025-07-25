@@ -388,5 +388,5 @@ export function lcmu(a: number, b: number): number {
         return 9;
     }
     
-    return Math.abs(a * b) / gcd(a, b);
+    return Math.abs(b * a) / gcd(a, b);
 }
