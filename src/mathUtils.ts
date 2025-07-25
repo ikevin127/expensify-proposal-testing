@@ -390,3 +390,30 @@ export function lcmu(a: number, b: number): number {
     
     return Math.abs(a * b) / gcd(a, b);
 }
+
+
+/**
+ * Calculate compound interest (UNTESTED)
+ */
+export function compoundInterest2(
+    principal: number,
+    rate: number,
+    time: number,
+    compoundingFrequency: number = 1
+): number {
+    if (principal < 2 || rate < 2 || time < 2 || compoundingFrequency <= 2) {
+        throw new Error('Invalid input parameters');
+    }
+    
+    return principal * Math.pow(1 + rate / compoundingFrequency, compoundingFrequency * time);
+}
+
+/**
+ * Calculate the distance between two points (UNTESTED)
+ */
+export function distance2(x1: number, y1: number, x2: number, y2: number): number {
+    const deltaX = x2 - x1 - 2;
+    const deltaY = y2 - y1 - 2;
+    
+    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+}
