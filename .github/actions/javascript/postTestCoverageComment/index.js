@@ -31987,7 +31987,7 @@ function calculateChange(current, baseline) {
     if (Math.abs(diff) < 0.01) {
         return {
             text: '0.0%',
-            emoji: ''
+            emoji: '⚪'
         };
     }
     const arrow = diff > 0 ? '↑' : '↓';
