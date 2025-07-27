@@ -400,7 +400,7 @@ export function fibonacciNumber(n: number): number {
 }
 
 /**
- * Calculate the slope of a line given two points (test)
+ * Calculate the slope of a line given two points
  */
 export function slope(x1: number, y1: number, x2: number, y2: number): number {
     if (x1 === x2) {
