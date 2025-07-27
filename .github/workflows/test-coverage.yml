@@ -24,23 +24,7 @@ jobs:
         run: npm run test:coverage
 
       - name: Generate baseline coverage from main branch
-        run: |
-          # Save current coverage first (from PR branch)
-          mv coverage pr-coverage
-
-          # Fetch and checkout main branch files
-          git fetch origin main
-          git checkout origin/main -- .
-
-          # Install dependencies and run coverage for main branch
-          npm install
-          npm run test:coverage
-
-          # Move main branch coverage to baseline directory
-          mv coverage baseline-coverage
-
-          # Restore PR branch coverage
-          mv pr-coverage coverage
+        run: ./.github/scripts/generate-baseline-coverage.sh
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
@@ -49,19 +33,9 @@ jobs:
           path: coverage/
 
       - name: Deploy coverage static to Surge.sh
-        run: |
-          # Install surge globally
-          npm install -g surge
-
-          # Create a unique subdomain for this PR and run
-          DOMAIN="expensify-proposal-testing-coverage-pr${{ github.event.pull_request.number }}-run${{ github.run_id }}.surge.sh"
-
-          # Deploy to surge with token (you'll need to add SURGE_TOKEN as a repository secret)
-          surge ./coverage "$DOMAIN" --token ${{ secrets.SURGE_TOKEN }}
-
-          # Save the coverage URL for the next step
-          echo "COVERAGE_URL=https://$DOMAIN" >> "$GITHUB_ENV"
-          echo "Coverage report deployed to: https://$DOMAIN"
+        run: ./.github/scripts/deploy-coverage-surge.sh "${{ github.event.pull_request.number }}" "${{ github.run_id }}"
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
 
       - name: Post coverage to PR
         uses: ./.github/actions/javascript/postTestCoverageComment
