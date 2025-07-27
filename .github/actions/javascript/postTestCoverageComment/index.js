@@ -32021,7 +32021,7 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
             newBody = `${beforeCoverage}${COVERAGE_SECTION_START}\n${coverageSection}${afterCoverage}`;
         } else {
             // Add coverage section at the end of the PR body
-            newBody = `${currentBody}\n${COVERAGE_SECTION_START}\n${coverageSection}`;
+            newBody = `${currentBody}\n\n${COVERAGE_SECTION_START}\n${coverageSection}`;
         }
 
         // Update PR body
