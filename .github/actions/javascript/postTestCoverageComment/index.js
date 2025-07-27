@@ -31860,49 +31860,39 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const {overall, changedFiles, baseCoverage} = coverageData;
     
     // Local template for easy editing
-    const coverageTemplate = `### 🧪 Test Coverage Report
+    const coverageTemplate = `## 📊 Test Coverage Report
 
-{{#hasBaseline}}
-{{#status.hasChange}}
+{{#status.hasChange}}### {{status.emoji}} **{{status.text}}**{{/status.hasChange}}
+{{#hasBaseline}}{{#status.hasChange}}
 \`\`\`diff
-{{#status.isIncrease}}+ 📊 Overall Coverage: {{current.lines}}% ↑ (baseline: {{baseline.lines}}%){{/status.isIncrease}}{{#status.isDecrease}}- 📊 Overall Coverage: {{current.lines}}% ↓ (baseline: {{baseline.lines}}%){{/status.isDecrease}}
+{{#status.isIncrease}}+ 📈 Overall Coverage: ↑ {{current.lines}}% (main: {{baseline.lines}}%){{/status.isIncrease}}{{#status.isDecrease}}- 📉 Overall Coverage: ↓ {{current.lines}}% (main: {{baseline.lines}}%){{/status.isDecrease}}
 \`\`\`
-{{/status.hasChange}}
-{{/hasBaseline}}
-
-{{#status.hasChange}}
-{{status.emoji}} **{{status.text}}**
-{{#hasBaseline}}
-{{#status.isIncrease}}📈{{/status.isIncrease}}{{#status.isDecrease}}📉{{/status.isDecrease}} Overall Coverage: {{current.lines}}% {{status.arrow}}
-{{status.changeEmoji}} {{status.changeText}} from baseline
-{{/hasBaseline}}
-{{/status.hasChange}}
-{{^status.hasChange}}
-{{#hasBaseline}}
-📊 Overall Coverage: {{current.lines}}% (unchanged)
-{{/hasBaseline}}
-{{^hasBaseline}}
-📊 **Overall Coverage**: {{current.lines}}%
-{{/hasBaseline}}
-{{/status.hasChange}}
-
+{{/status.hasChange}}{{/hasBaseline}}{{#status.hasChange}}
+> {{#status.isIncrease}}[!TIP]{{/status.isIncrease}}{{#status.isDecrease}}[!CAUTION]{{/status.isDecrease}}
+> {{status.changeEmoji}} **{{status.changeText}}**
+{{/status.hasChange}}{{^status.hasChange}}{{#hasBaseline}}
+\`\`\`diff
+🔁 Overall Coverage: {{current.lines}}% (unchanged from main)
+\`\`\`
+{{/hasBaseline}}{{^hasBaseline}}
+\`\`\`diff
+🔁 **Overall Coverage**: {{current.lines}}%
+\`\`\`
+{{/hasBaseline}}{{/status.hasChange}}
 <details>
-<summary><strong>📋 Coverage Details</strong></summary>
+<summary><strong>📁 Coverage details</strong></summary>
 <br>
 {{#hasChangedFiles}}
 | File | Coverage | Lines |
 |------|----------|-------|
-{{#changedFiles}}| \`{{displayFile}}\` | {{coverage}}% | {{lines}} |
-{{/changedFiles}}
+{{#changedFiles}}| \`{{displayFile}}\` | {{coverage}}% | {{lines}} |{{/changedFiles}}
 {{/hasChangedFiles}}
-{{^hasChangedFiles}}
-*No coverage changed files found.*
-{{/hasChangedFiles}}
+{{^hasChangedFiles}}*No coverage changed files found.*{{/hasChangedFiles}}
 **🔄 Overall Coverage Summary**
 {{#hasBaseline}}
-- **Lines**: {{current.lines}}% ({{changes.lines.emoji}} {{changes.lines.text}})
-- **Statements**: {{current.statements}}% ({{changes.statements.emoji}} {{changes.statements.text}})
-- **Functions**: {{current.functions}}% ({{changes.functions.emoji}} {{changes.functions.text}})
+- **Lines**: {{current.lines}}% ({{changes.lines.text}})
+- **Statements**: {{current.statements}}% ({{changes.statements.text}})
+- **Functions**: {{current.functions}}% ({{changes.functions.text}})
 {{/hasBaseline}}
 {{^hasBaseline}}
 - **Lines**: {{current.lines}}%
@@ -31912,8 +31902,8 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 
 </details>
 
-📄 [View Full Coverage Report]({{links.coverageReport}})
-🔗 [View Workflow Run Summary]({{links.workflowRun}})
+📄 [View Web Report]({{links.coverageReport}})
+⚙️ [View Workflow Run]({{links.workflowRun}})
 
 <!-- END_COVERAGE_SECTION -->`;
     
@@ -31951,9 +31941,9 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
         },
         
         baseline: baseCoverage ? {
-            lines: baseCoverage.lines?.toFixed(2),
-            functions: baseCoverage.functions?.toFixed(2),
-            statements: baseCoverage.statements?.toFixed(2),
+            lines: baseCoverage.lines?.toFixed(1),
+            functions: baseCoverage.functions?.toFixed(1),
+            statements: baseCoverage.statements?.toFixed(1),
         } : null,
         
         status: {
@@ -31964,7 +31954,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
             isDecrease: coverageStatus.diff < 0,
             arrow: coverageStatus.diff > 0 ? '↑' : '↓',
             changeEmoji: coverageStatus.diff > 0 ? '🚀' : '⚠️',
-            changeText: `${Math.abs(coverageStatus.diff)?.toFixed(1)}% ${coverageStatus.diff > 0 ? 'gain' : 'drop'}`
+            changeText: `${Math.abs(coverageStatus.diff)?.toFixed(1)}% ${coverageStatus.diff > 0 ? 'increase' : 'decrease'} from main`
         },
         
         changes,
@@ -31984,35 +31974,24 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
  */
 function calculateChange(current, baseline) {
     const diff = current - baseline;
-    if (Math.abs(diff) < 0.01) {
-        return {
-            text: '0.0%',
-            emoji: ''
-        };
+    if (!baseline || Math.abs(diff) < 0.01) {
+        return '0.0%';
     }
-    const arrow = diff > 0 ? '↑' : '↓';
-    const emoji = diff > 0 ? '📈' : '📉';
-    return {
-        text: `${diff > 0 ? '+' : ''}${diff?.toFixed(2)}%`,
-        emoji: `${emoji} ${arrow} ${Math.abs(diff)?.toFixed(1)}%`
-    };
+    return `${diff > 0 ? '+' : '-'}${diff?.toFixed(1)}%`
 }
 
 /**
  * Generate coverage status emoji and text based on comparison with baseline
  */
-function getCoverageStatus(current, base) {
-    if (!base) {
-        return {emoji: '📊', status: 'Overall Coverage', diff: 0};
-    }
-    const diff = current - base;
-    if (Math.abs(diff) < 0.01) {
-        return {emoji: '📊', status: 'Overall Coverage', diff: 0};
+function getCoverageStatus(current, baseline) {
+    const diff = current - baseline;
+    if (!baseline || Math.abs(diff) < 0.01) {
+        return {emoji: '', status: '', diff: 0};
     }
     if (diff > 0) {
-        return {emoji: '🟢', status: 'Coverage up!', diff};
+        return {emoji: '🟢', status: 'Coverage up', diff};
     }
-    return {emoji: '🔴', status: 'Coverage dropped!', diff};
+    return {emoji: '🔴', status: 'Coverage dropped', diff};
 }
 
 /**
