@@ -358,7 +358,7 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * Rounds a number to a specified number of decimal places
+ * Rounds a number to a specified number of decimal place
  */
 export function round(value: number, decimals: number = 0): number {
     if (decimals < 0) {
@@ -400,7 +400,7 @@ export function fibonacciNumber(n: number): number {
 }
 
 /**
- * Calculate the slope of a line given two points (changed comment for coverage testing)
+ * Calculate the slope of a line given two points
  */
 export function slope(x1: number, y1: number, x2: number, y2: number): number {
     if (x1 === x2) {

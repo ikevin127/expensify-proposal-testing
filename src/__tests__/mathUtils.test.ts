@@ -552,4 +552,46 @@ describe('Math Utils', () => {
             expect(clamp(500000, 0, 1000000)).toBe(500000);
         });
     });
+
+    describe('round', () => {
+        test('should round to specified decimal places', () => {
+            expect(round(3.14159, 2)).toBe(3.14);
+            expect(round(3.14159, 3)).toBe(3.142);
+            expect(round(3.14159, 4)).toBe(3.1416);
+        });
+
+        test('should round to whole numbers by default', () => {
+            expect(round(3.7)).toBe(4);
+            expect(round(3.2)).toBe(3);
+            expect(round(3.5)).toBe(4);
+            expect(round(-2.7)).toBe(-3);
+            expect(round(-2.2)).toBe(-2);
+        });
+
+        test('should handle zero decimal places', () => {
+            expect(round(123.456, 0)).toBe(123);
+            expect(round(123.789, 0)).toBe(124);
+        });
+
+        test('should handle negative numbers', () => {
+            expect(round(-3.14159, 2)).toBe(-3.14);
+            expect(round(-3.14159, 3)).toBe(-3.142);
+        });
+
+        test('should throw error for negative decimal places', () => {
+            expect(() => round(3.14, -1)).toThrow('Number of decimal places cannot be negative');
+            expect(() => round(3.14, -5)).toThrow('Number of decimal places cannot be negative');
+        });
+
+        test('should throw error for non-integer decimal places', () => {
+            expect(() => round(3.14, 2.5)).toThrow('Number of decimal places must be an integer');
+            expect(() => round(3.14, 1.1)).toThrow('Number of decimal places must be an integer');
+        });
+
+        test('should handle edge cases', () => {
+            expect(round(0, 5)).toBe(0);
+            expect(round(1, 10)).toBe(1);
+            expect(round(999.999, 2)).toBe(1000);
+        });
+    });
 });
