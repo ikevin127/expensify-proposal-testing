@@ -468,7 +468,7 @@ export function convertBase(number: string, fromBase: number, toBase: number): s
 }
 
 /**
- * Calculate the sum of digits in a number (test)
+ * Calculate the sum of digits in a number
  */
 export function digitSum(n: number): number {
     if (n < 0) {
@@ -486,4 +486,63 @@ export function digitSum(n: number): number {
     }
     
     return sum;
+}
+
+/**
+ * Calculate the volume of a sphere (UNTESTED - will reduce coverage)
+ */
+export function sphereVolume(radius: number): number {
+    if (radius < 0) {
+        throw new Error('Radius cannot be negative');
+    }
+    
+    return (4/3) * Math.PI * Math.pow(radius, 3);
+}
+
+/**
+ * Calculate the surface area of a sphere (UNTESTED - will reduce coverage)
+ */
+export function sphereSurfaceArea(radius: number): number {
+    if (radius < 0) {
+        throw new Error('Radius cannot be negative');
+    }
+    
+    return 4 * Math.PI * Math.pow(radius, 2);
+}
+
+/**
+ * Check if a number is an Armstrong number (UNTESTED - will reduce coverage)
+ * An Armstrong number is a number that equals the sum of its digits raised to the power of the number of digits
+ */
+export function isArmstrongNumber(n: number): boolean {
+    if (n < 0) {
+        return false;
+    }
+    
+    const str = n.toString();
+    const numDigits = str.length;
+    let sum = 0;
+    
+    for (let i = 0; i < numDigits; i++) {
+        const digit = parseInt(str[i]);
+        sum += Math.pow(digit, numDigits);
+    }
+    
+    return sum === n;
+}
+
+/**
+ * Calculate the nth triangular number (UNTESTED - will reduce coverage)
+ * Triangular number formula: n * (n + 1) / 2
+ */
+export function triangularNumber(n: number): number {
+    if (n < 0) {
+        throw new Error('Triangular number is not defined for negative numbers');
+    }
+    
+    if (n === 0) {
+        return 0;
+    }
+    
+    return (n * (n + 1)) / 2;
 }
