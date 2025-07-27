@@ -5,6 +5,7 @@ import path from 'path';
 
 const COVERAGE_SECTION_START = '<!-- START_COVERAGE_SECTION -->';
 const COVERAGE_SECTION_END = '<!-- END_COVERAGE_SECTION -->';
+const COVERAGE_SECTION_HEADER = `## 📊 Test Coverage Report`;
 
 /**
  * Get list of changed files in the PR
@@ -145,7 +146,7 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
     const {overall, changedFiles, baseCoverage} = coverageData;
     
     // Local template for easy editing
-    const coverageTemplate = `## 📊 Test Coverage Report
+    const coverageTemplate = `${COVERAGE_SECTION_HEADER}
 
 {{#status.hasChange}}### {{status.emoji}} **{{status.text}}**{{/status.hasChange}}
 {{#hasBaseline}}{{#status.hasChange}}
@@ -387,7 +388,7 @@ async function run() {
         // Add coverage information to GitHub Job Summary (displays on workflow run page)
         await core.summary
             .addHeading(`📊 Test Coverage Report for PR #${prNumber}`, 2)
-            .addRaw(coverageSection)
+            .addRaw(coverageSection.replace(COVERAGE_SECTION_HEADER, ""))
             .addSeparator()
             .addRaw('💡 This summary is also available in the PR description.')
             .write();
