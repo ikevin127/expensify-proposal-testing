@@ -176,9 +176,9 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{^hasChangedFiles}}*No coverage changed files found.*{{/hasChangedFiles}}
 **🔄 Overall Coverage Summary**
 {{#hasBaseline}}
-- **Lines**: {{current.lines}}% ({{changes.lines.text}})
-- **Statements**: {{current.statements}}% ({{changes.statements.text}})
-- **Functions**: {{current.functions}}% ({{changes.functions.text}})
+- **Lines**: {{current.lines}}% ({{changes.lines}})
+- **Statements**: {{current.statements}}% ({{changes.statements}})
+- **Functions**: {{current.functions}}% ({{changes.functions}})
 {{/hasBaseline}}
 {{^hasBaseline}}
 - **Lines**: {{current.lines}}%
@@ -305,9 +305,8 @@ async function updatePRBody(octokit, prNumber, coverageSection) {
             const afterCoverage = currentBody.substring(coverageEndIndex + COVERAGE_SECTION_END.length);
             newBody = `${beforeCoverage}${COVERAGE_SECTION_START}\n${coverageSection}${afterCoverage}`;
         } else {
-            // Add coverage section at the end
-            const separator = currentBody.trim() ? '\n\n##\n\n' : '';
-            newBody = `${currentBody + separator}\n${COVERAGE_SECTION_START}\n${coverageSection}`;
+            // Add coverage section at the end of the PR body
+            newBody = `${currentBody}\n${COVERAGE_SECTION_START}\n${coverageSection}`;
         }
 
         // Update PR body
@@ -390,7 +389,7 @@ async function run() {
             .addHeading(`📊 Test Coverage Report for PR #${prNumber}`, 2)
             .addRaw(coverageSection.replace(COVERAGE_SECTION_HEADER, ""))
             .addSeparator()
-            .addRaw('💡 This summary is also available in the PR description.')
+            .addRaw('💡 This summary is also available at the end of the PR description.')
             .write();
 
         // Set outputs
