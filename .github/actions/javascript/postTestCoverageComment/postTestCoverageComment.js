@@ -263,7 +263,8 @@ function calculateChange(current, baseline) {
     if (!baseline || Math.abs(diff) < 0.01) {
         return '0.0%';
     }
-    return `${diff > 0 ? '+' : '-'}${diff?.toFixed(1)}%`
+    // Negative sign is already handled by the diff calculation
+    return `${diff > 0 ? '+' : ''}${diff?.toFixed(1)}%`
 }
 
 /**
