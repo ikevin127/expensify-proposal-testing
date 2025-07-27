@@ -468,7 +468,7 @@ export function convertBase(number: string, fromBase: number, toBase: number): s
 }
 
 /**
- * Calculate the sum of digits in a number (test)
+ * Calculate the sum of digits in a number (unchanged test case)
  */
 export function digitSum(n: number): number {
     if (n < 0) {
