@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Ensure origin/main exists
-git fetch --depth=1 origin main
+# Ensure upstream/main exists
+git fetch --depth=1 upstream main
 
 # Determine diff range safely
-if git merge-base origin/main HEAD >/dev/null 2>&1; then
-  DIFF_RANGE="origin/main...HEAD"
+if git merge-base upstream/main HEAD >/dev/null 2>&1; then
+  DIFF_RANGE="upstream/main...HEAD"
 else
-  echo "No merge base with origin/main; falling back to comparing HEAD against origin/main"
-  DIFF_RANGE="origin/main HEAD"
+  echo "No merge base with upstream/main; falling back to comparing HEAD against upstream/main"
+  DIFF_RANGE="upstream/main HEAD"
 fi
 
 # Get changed files in src directory

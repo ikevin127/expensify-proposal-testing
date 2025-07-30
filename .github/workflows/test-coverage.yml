@@ -31,6 +31,11 @@ jobs:
           repository: ${{ steps.get_pr.outputs.repo }}
           ref: ${{ steps.get_pr.outputs.ref }}
 
+      - name: Add upstream remote for base repo
+        run: |
+          git remote add upstream https://github.com/${{ github.repository }}.git
+          git fetch upstream main
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
