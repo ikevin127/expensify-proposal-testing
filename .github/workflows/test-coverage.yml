@@ -1,43 +1,64 @@
 name: Test Coverage
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-    paths: ["src/**/*.ts"]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR Number"
+        required: true
+        type: number
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Get PR Info
+        id: get_pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const PR = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.inputs.pr_number
+            })
+            core.setOutput('repo', PR.data.head.repo.full_name)
+            core.setOutput('ref', PR.data.head.ref)
 
-      - name: Setup Node
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.get_pr.outputs.repo }}
+          ref: ${{ steps.get_pr.outputs.ref }}
+
+      - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      - name: Check Changed Coverage src/ Files
+        id: check-src-changes
+        run: ./.github/scripts/checkCoverageChanges.sh
+
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm run test:coverage
+      - name: Run Coverage for Changed Files
+        if: steps.check-src-changes.outputs.run_coverage == 'true'
+        run: ./.github/scripts/runPRCoverage.sh
+        env:
+          CI: true
 
-      - name: Generate baseline coverage from main branch
-        run: ./.github/scripts/generate-baseline-coverage.sh
+      - name: Generate Baseline Coverage From The Main Branch
+        if: steps.check-src-changes.outputs.run_coverage == 'true'
+        run: ./.github/scripts/generateBaselineCoverage.sh
 
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-
-      - name: Deploy coverage static to Surge.sh
+      - name: Deploy Coverage Static to Surge.sh
         run: ./.github/scripts/deploy-coverage-surge.sh "${{ github.event.pull_request.number }}" "${{ github.run_id }}"
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
 
-      - name: Post coverage to PR
+      - name: Post Coverage to PR
         uses: ./.github/actions/javascript/postTestCoverageComment
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
