@@ -54,7 +54,7 @@ jobs:
         run: ./.github/scripts/generateBaselineCoverage.sh
 
       - name: Deploy Coverage Static to Surge.sh
-        run: ./.github/scripts/deploy-coverage-surge.sh "${{ github.event.pull_request.number }}" "${{ github.run_id }}"
+        run: ./.github/scripts/deploy-coverage-surge.sh "${{ github.event.inputs.pr_number }}" "${{ github.run_id }}"
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
 
@@ -62,7 +62,7 @@ jobs:
         uses: ./.github/actions/javascript/postTestCoverageComment
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
           COVERAGE_ARTIFACT_NAME: coverage-report
           COVERAGE_URL: ${{ env.COVERAGE_URL }}
           BASE_COVERAGE_PATH: ./baseline-coverage

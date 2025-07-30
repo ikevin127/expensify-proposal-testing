@@ -1,12 +1,18 @@
 #!/bin/bash
 
-# Ensure origin/main is available (important in GitHub Actions)
-git fetch origin main
+# Ensure origin/main exists
+git fetch --depth=1 origin main
 
-# Check if src files changed and filter out excluded directories/files
+# Determine diff range safely
+if git merge-base origin/main HEAD >/dev/null 2>&1; then
+  DIFF_RANGE="origin/main...HEAD"
+else
+  echo "No merge base with origin/main; falling back to comparing HEAD against origin/main"
+  DIFF_RANGE="origin/main HEAD"
+fi
 
 # Get changed files in src directory
-readarray -t ALL_CHANGED_FILES < <(git diff --name-only origin/main...HEAD | grep '^src/' | grep -E '\.(ts|tsx|js|jsx)$' || true)
+readarray -t ALL_CHANGED_FILES < <(git diff --name-only $DIFF_RANGE | grep '^src/' | grep -E '\.(ts|tsx|js|jsx)$' || true)
 
 # Filter out excluded directories and files
 CHANGED_FILES=()
