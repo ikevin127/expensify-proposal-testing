@@ -523,7 +523,7 @@ export function isPerfectNumber(n: number): boolean {
 }
 
 /**
- * Calculate the logarithm of a number with a specified base
+ * Calculate the logarithm of a number with a specified base (test slightly up)
  */
 export function logBase(number: number, base: number): number {
     if (number <= 0) {
