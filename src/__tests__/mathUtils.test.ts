@@ -34,6 +34,9 @@ import {
     triangleArea,
     convertBase,
     digitSum,
+    sumOfSquares,
+    isPerfectNumber,
+    logBase,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -686,4 +689,134 @@ describe('Math Utils', () => {
             expect(round(999.999, 2)).toBe(1000);
         });
     });
+
+    describe('fibonacciNumber', () => {
+        test('should calculate nth Fibonacci number', () => {
+            expect(fibonacciNumber(0)).toBe(0);
+            expect(fibonacciNumber(1)).toBe(1);
+            expect(fibonacciNumber(2)).toBe(1);
+            expect(fibonacciNumber(3)).toBe(2);
+            expect(fibonacciNumber(10)).toBe(55);
+        });
+
+        test('should throw error for negative numbers', () => {
+            expect(() => fibonacciNumber(-1)).toThrow('Fibonacci number is not defined for negative numbers');
+        });
+    });
+
+    describe('slope', () => {
+        test('should calculate the slope of a line', () => {
+            expect(slope(1, 2, 3, 6)).toBe(2);
+            expect(slope(0, 0, 2, 4)).toBe(2);
+            expect(slope(-1, -1, 1, 1)).toBe(1);
+        });
+
+        test('should throw error for vertical line', () => {
+            expect(() => slope(1, 2, 1, 5)).toThrow('Cannot calculate slope for vertical line (undefined slope)');
+        });
+    });
+
+    describe('hypotenuse', () => {
+        test('should calculate the hypotenuse of a triangle', () => {
+            expect(hypotenuse(3, 4)).toBe(5);
+            expect(hypotenuse(5, 12)).toBe(13);
+            expect(hypotenuse(8, 15)).toBe(17);
+        });
+
+        test('should throw error for negative sides', () => {
+            expect(() => hypotenuse(-3, 4)).toThrow('Side lengths cannot be negative');
+            expect(() => hypotenuse(3, -4)).toThrow('Side lengths cannot be negative');
+        });
+
+        test('should return 0 for zero sides', () => {
+            expect(hypotenuse(0, 0)).toBe(0);
+        });
+    });
+
+    describe('triangleArea', () => {
+        test('should calculate the area of a triangle', () => {
+            expect(triangleArea(3, 4, 5)).toBe(6);
+            expect(triangleArea(6, 8, 10)).toBe(24);
+            expect(triangleArea(7, 24, 25)).toBe(84);
+        });
+
+        test('should throw error for invalid triangles', () => {
+            expect(() => triangleArea(1, 1, 3)).toThrow('Invalid triangle: sides do not satisfy triangle inequality');
+            expect(() => triangleArea(0, 4, 5)).toThrow('All side lengths must be positive');
+        });
+    });
+
+    describe('convertBase', () => {
+        test('should convert a number to a different base', () => {
+            expect(convertBase('1010', 2, 10)).toBe('10');
+            expect(convertBase('A', 16, 10)).toBe('10');
+            expect(convertBase('100', 10, 2)).toBe('1100100');
+        });
+
+        test('should throw error for invalid bases', () => {
+            expect(() => convertBase('10', 1, 10)).toThrow('Base must be between 2 and 36');
+            expect(() => convertBase('10', 10, 37)).toThrow('Base must be between 2 and 36');
+        });
+
+        test('should throw error for invalid numbers', () => {
+            expect(() => convertBase('G', 16, 10)).toThrow('Invalid number for the specified base');
+            expect(() => convertBase('', 10, 2)).toThrow('Number string cannot be empty');
+        });
+    });
+
+    describe('digitSum', () => {
+        test('should calculate the sum of digits', () => {
+            expect(digitSum(123)).toBe(6);
+            expect(digitSum(456)).toBe(15);
+            expect(digitSum(0)).toBe(0);
+        });
+
+        test('should handle negative numbers by using absolute value', () => {
+            expect(digitSum(-123)).toBe(6);
+        });
+    });
+
+    describe('sumOfSquares', () => {
+        test('should calculate sum of squares of numbers', () => {
+            expect(sumOfSquares([1, 2, 3])).toBe(14);
+            expect(sumOfSquares([4, 5, 6])).toBe(77);
+            expect(sumOfSquares([-1, -2, -3])).toBe(14);
+        });
+
+        test('should throw error for empty array', () => {
+            expect(() => sumOfSquares([])).toThrow('Cannot calculate sum of squares of empty array');
+        });
+    });
+
+    describe('isPerfectNumber', () => {
+        test('should return true for perfect numbers', () => {
+            expect(isPerfectNumber(6)).toBe(true);
+            expect(isPerfectNumber(28)).toBe(true);
+            expect(isPerfectNumber(496)).toBe(true);
+        });
+
+        test('should return false for non-perfect numbers', () => {
+            expect(isPerfectNumber(5)).toBe(false);
+            expect(isPerfectNumber(10)).toBe(false);
+        });
+    });
+
+    describe('logBase', () => {
+        test('should calculate logarithm of a number with a given base', () => {
+            expect(logBase(8, 2)).toBeCloseTo(3, 5);
+            expect(logBase(100, 10)).toBeCloseTo(2, 5);
+            expect(logBase(27, 3)).toBeCloseTo(3, 5);
+        });
+
+        test('should throw error for non-positive numbers', () => {
+            expect(() => logBase(0, 10)).toThrow('Number must be positive for logarithm calculation');
+            expect(() => logBase(-5, 10)).toThrow('Number must be positive for logarithm calculation');
+        });
+
+        test('should throw error for invalid bases', () => {
+            expect(() => logBase(10, 0)).toThrow('Base must be positive and not equal to 1');
+            expect(() => logBase(10, 1)).toThrow('Base must be positive and not equal to 1');
+        });
+    });
+
 });

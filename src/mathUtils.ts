@@ -487,3 +487,52 @@ export function digitSum(n: number): number {
     
     return sum;
 }
+
+/**
+ * Calculate the sum of squares of an array of numbers
+ */
+export function sumOfSquares(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate sum of squares of empty array');
+    }
+    
+    return numbers.reduce((sum, num) => sum + (num * num), 0);
+}
+
+/**
+ * Check if a number is a perfect number (sum of proper divisors equals the number)
+ */
+export function isPerfectNumber(n: number): boolean {
+    if (n <= 1) {
+        return false;
+    }
+    
+    let sum = 1; // 1 is always a proper divisor for n > 1
+    
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i === 0) {
+            sum += i;
+            // Add the corresponding divisor if it's different from i
+            if (i !== n / i) {
+                sum += n / i;
+            }
+        }
+    }
+    
+    return sum === n;
+}
+
+/**
+ * Calculate the logarithm of a number with a specified base
+ */
+export function logBase(number: number, base: number): number {
+    if (number <= 0) {
+        throw new Error('Number must be positive for logarithm calculation');
+    }
+    
+    if (base <= 0 || base === 1) {
+        throw new Error('Base must be positive and not equal to 1');
+    }
+    
+    return Math.log(number) / Math.log(base);
+}
