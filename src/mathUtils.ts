@@ -487,3 +487,103 @@ export function digitSum(n: number): number {
     
     return sum;
 }
+
+/**
+ * Calculate the standard deviation of an array of numbers (UNTESTED)
+ */
+export function standardDeviation(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate standard deviation of empty array');
+    }
+    
+    if (numbers.length === 1) {
+        return 0;
+    }
+    
+    const mean = average(numbers);
+    const squaredDifferences = numbers.map(num => Math.pow(num - mean, 2));
+    const variance = squaredDifferences.reduce((acc, val) => acc + val, 0) / (numbers.length - 1);
+    
+    return Math.sqrt(variance);
+}
+
+/**
+ * Find all prime factors of a number (UNTESTED)
+ */
+export function primeFactors(n: number): number[] {
+    if (n <= 1) {
+        return [];
+    }
+    
+    const factors: number[] = [];
+    let divisor = 2;
+    
+    while (divisor * divisor <= n) {
+        while (n % divisor === 0) {
+            factors.push(divisor);
+            n = n / divisor;
+        }
+        divisor++;
+    }
+    
+    if (n > 1) {
+        factors.push(n);
+    }
+    
+    return factors;
+}
+
+/**
+ * Calculate the mode (most frequent value) of an array of numbers (UNTESTED)
+ */
+export function mode(numbers: number[]): number[] {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate mode of empty array');
+    }
+    
+    const frequency: { [key: number]: number } = {};
+    let maxFrequency = 0;
+    
+    // Count frequencies
+    for (const num of numbers) {
+        frequency[num] = (frequency[num] || 0) + 1;
+        maxFrequency = Math.max(maxFrequency, frequency[num]);
+    }
+    
+    // Find all numbers with maximum frequency
+    const modes: number[] = [];
+    for (const num in frequency) {
+        if (frequency[num] === maxFrequency) {
+            modes.push(parseFloat(num));
+        }
+    }
+    
+    return modes.sort((a, b) => a - b);
+}
+
+/**
+ * Calculate the binomial coefficient (n choose k) (UNTESTED)
+ */
+export function binomialCoefficient(n: number, k: number): number {
+    if (n < 0 || k < 0) {
+        throw new Error('Both n and k must be non-negative');
+    }
+    
+    if (k > n) {
+        return 0;
+    }
+    
+    if (k === 0 || k === n) {
+        return 1;
+    }
+    
+    // Use the more efficient formula: C(n,k) = C(n,n-k)
+    k = Math.min(k, n - k);
+    
+    let result = 1;
+    for (let i = 0; i < k; i++) {
+        result = result * (n - i) / (i + 1);
+    }
+    
+    return Math.round(result);
+}
