@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure origin/main is available (important in GitHub Actions)
+git fetch origin main
+
 # Check if src files changed and filter out excluded directories/files
 
 # Get changed files in src directory
