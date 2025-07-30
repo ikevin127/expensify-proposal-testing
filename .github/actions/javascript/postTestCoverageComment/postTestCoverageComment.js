@@ -391,7 +391,7 @@ async function run() {
             .addRaw(coverageSection.replace(COVERAGE_SECTION_HEADER, ""))
             .addSeparator()
             .addRaw('💡 This summary is also available at the end of the PR description.')
-            .write();
+            .write({overwrite: true});
 
         // Set outputs
         core.setOutput('coverage-summary', JSON.stringify(coverageData.overall));
