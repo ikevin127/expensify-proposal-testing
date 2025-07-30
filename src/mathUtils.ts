@@ -536,3 +536,52 @@ export function logBase(number: number, base: number): number {
     
     return Math.log(number) / Math.log(base);
 }
+
+/**
+ * Calculate the variance of an array of numbers (UNTESTED)
+ */
+export function variance(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate variance of empty array');
+    }
+    
+    if (numbers.length === 1) {
+        return 0;
+    }
+    
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const squaredDifferences = numbers.map(num => Math.pow(num - mean, 2));
+    const variance = squaredDifferences.reduce((sum, diff) => sum + diff, 0) / (numbers.length - 1);
+    
+    return variance;
+}
+
+/**
+ * Find the roots of a quadratic equation ax² + bx + c = 0 (UNTESTED)
+ */
+export function quadraticRoots(a: number, b: number, c: number): { real: number[], imaginary: number[] } {
+    if (a === 0) {
+        throw new Error('Coefficient "a" cannot be zero for quadratic equation');
+    }
+    
+    const discriminant = b * b - 4 * a * c;
+    
+    if (discriminant > 0) {
+        // Two real roots
+        const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+        const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+        return { real: [root1, root2], imaginary: [] };
+    } else if (discriminant === 0) {
+        // One real root (repeated)
+        const root = -b / (2 * a);
+        return { real: [root], imaginary: [] };
+    } else {
+        // Two complex roots
+        const realPart = -b / (2 * a);
+        const imaginaryPart = Math.sqrt(-discriminant) / (2 * a);
+        return { 
+            real: [realPart, realPart], 
+            imaginary: [imaginaryPart, -imaginaryPart] 
+        };
+    }
+}
