@@ -487,3 +487,89 @@ export function digitSum(n: number): number {
     
     return sum;
 }
+
+
+/**
+ * Calculate the geometric mean of an array of positive numbers (UNTESTED)
+ */
+export function geometricMean(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate geometric mean of empty array');
+    }
+
+    for (const num of numbers) {
+        if (num <= 0) {
+            throw new Error('All numbers must be positive for geometric mean');
+        }
+    }
+
+    const product = numbers.reduce((acc, num) => acc * num, 1);
+    return Math.pow(product, 1 / numbers.length);
+}
+
+/**
+ * Check if a number is an Armstrong number (narcissistic number) (UNTESTED)
+ */
+export function isArmstrongNumber(n: number): boolean {
+    if (n < 0) {
+        return false;
+    }
+
+    const str = n.toString();
+    const digits = str.length;
+    const sum = str
+        .split('')
+        .map(digit => Math.pow(parseInt(digit), digits))
+        .reduce((acc, val) => acc + val, 0);
+
+    return sum === n;
+}
+
+/**
+ * Calculate the harmonic mean of an array of positive numbers (UNTESTED)
+ */
+export function harmonicMean(numbers: number[]): number {
+    if (numbers.length === 0) {
+        throw new Error('Cannot calculate harmonic mean of empty array');
+    }
+
+    for (const num of numbers) {
+        if (num <= 0) {
+            throw new Error('All numbers must be positive for harmonic mean');
+        }
+    }
+
+    const reciprocalSum = numbers.reduce((acc, num) => acc + (1 / num), 0);
+    return numbers.length / reciprocalSum;
+}
+
+/**
+ * Generate Pascal's triangle up to n rows (UNTESTED)
+ */
+export function pascalsTriangle(n: number): number[][] {
+    if (n < 0) {
+        throw new Error('Number of rows cannot be negative');
+    }
+
+    if (n === 0) {
+        return [];
+    }
+
+    const triangle: number[][] = [];
+
+    for (let i = 0; i < n; i++) {
+        const row: number[] = [];
+
+        for (let j = 0; j <= i; j++) {
+            if (j === 0 || j === i) {
+                row.push(1);
+            } else {
+                row.push(triangle[i - 1][j - 1] + triangle[i - 1][j]);
+            }
+        }
+
+        triangle.push(row);
+    }
+
+    return triangle;
+}
