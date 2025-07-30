@@ -28,6 +28,12 @@ import {
     isPalindrome,
     clamp,
     round,
+    fibonacciNumber,
+    slope,
+    hypotenuse,
+    triangleArea,
+    convertBase,
+    digitSum,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -550,6 +556,92 @@ describe('Math Utils', () => {
             expect(clamp(1000000, 0, 999999)).toBe(999999);
             expect(clamp(-1000000, -999999, 0)).toBe(-999999);
             expect(clamp(500000, 0, 1000000)).toBe(500000);
+        });
+    });
+
+    describe('fibonacciNumber', () => {
+        test('should calculate nth Fibonacci number', () => {
+            expect(fibonacciNumber(0)).toBe(0);
+            expect(fibonacciNumber(1)).toBe(1);
+            expect(fibonacciNumber(2)).toBe(1);
+            expect(fibonacciNumber(3)).toBe(2);
+            expect(fibonacciNumber(10)).toBe(55);
+        });
+
+        test('should throw error for negative numbers', () => {
+            expect(() => fibonacciNumber(-1)).toThrow('Fibonacci number is not defined for negative numbers');
+        });
+    });
+
+    describe('slope', () => {
+        test('should calculate the slope of a line', () => {
+            expect(slope(1, 2, 3, 6)).toBe(2);
+            expect(slope(0, 0, 2, 4)).toBe(2);
+            expect(slope(-1, -1, 1, 1)).toBe(1);
+        });
+
+        test('should throw error for vertical line', () => {
+            expect(() => slope(1, 2, 1, 5)).toThrow('Cannot calculate slope for vertical line (undefined slope)');
+        });
+    });
+
+    describe('hypotenuse', () => {
+        test('should calculate the hypotenuse of a triangle', () => {
+            expect(hypotenuse(3, 4)).toBe(5);
+            expect(hypotenuse(5, 12)).toBe(13);
+            expect(hypotenuse(8, 15)).toBe(17);
+        });
+
+        test('should throw error for negative sides', () => {
+            expect(() => hypotenuse(-3, 4)).toThrow('Side lengths cannot be negative');
+            expect(() => hypotenuse(3, -4)).toThrow('Side lengths cannot be negative');
+        });
+
+        test('should return 0 for zero sides', () => {
+            expect(hypotenuse(0, 0)).toBe(0);
+        });
+    });
+
+    describe('triangleArea', () => {
+        test('should calculate the area of a triangle', () => {
+            expect(triangleArea(3, 4, 5)).toBe(6);
+            expect(triangleArea(6, 8, 10)).toBe(24);
+            expect(triangleArea(7, 24, 25)).toBe(84);
+        });
+
+        test('should throw error for invalid triangles', () => {
+            expect(() => triangleArea(1, 1, 3)).toThrow('Invalid triangle: sides do not satisfy triangle inequality');
+            expect(() => triangleArea(0, 4, 5)).toThrow('All side lengths must be positive');
+        });
+    });
+
+    describe('convertBase', () => {
+        test('should convert a number to a different base', () => {
+            expect(convertBase('1010', 2, 10)).toBe('10');
+            expect(convertBase('A', 16, 10)).toBe('10');
+            expect(convertBase('100', 10, 2)).toBe('1100100');
+        });
+
+        test('should throw error for invalid bases', () => {
+            expect(() => convertBase('10', 1, 10)).toThrow('Base must be between 2 and 36');
+            expect(() => convertBase('10', 10, 37)).toThrow('Base must be between 2 and 36');
+        });
+
+        test('should throw error for invalid numbers', () => {
+            expect(() => convertBase('G', 16, 10)).toThrow('Invalid number for the specified base');
+            expect(() => convertBase('', 10, 2)).toThrow('Number string cannot be empty');
+        });
+    });
+
+    describe('digitSum', () => {
+        test('should calculate the sum of digits', () => {
+            expect(digitSum(123)).toBe(6);
+            expect(digitSum(456)).toBe(15);
+            expect(digitSum(0)).toBe(0);
+        });
+
+        test('should handle negative numbers by using absolute value', () => {
+            expect(digitSum(-123)).toBe(6);
         });
     });
 
