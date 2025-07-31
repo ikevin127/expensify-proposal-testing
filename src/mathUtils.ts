@@ -107,7 +107,7 @@ export function average(numbers: number[]): number {
 }
 
 /**
- * Calculate the power of a number (UNTESTED - will reduce coverage)
+ * Calculate the power of a number
  */
 export function power(base: number, exponent: number): number {
     if (exponent === 0) {
@@ -538,7 +538,7 @@ export function logBase(number: number, base: number): number {
 }
 
 /**
- * Calculate the variance of an array of numbers (UNTESTED)
+ * Calculate the variance of an array of numbers
  */
 export function variance(numbers: number[]): number {
     if (numbers.length === 0) {
@@ -557,7 +557,7 @@ export function variance(numbers: number[]): number {
 }
 
 /**
- * Find the roots of a quadratic equation ax² + bx + c = 0 (UNTESTED)
+ * Find the roots of a quadratic equation ax² + bx + c = 0
  */
 export function quadraticRoots(a: number, b: number, c: number): { real: number[], imaginary: number[] } {
     if (a === 0) {
