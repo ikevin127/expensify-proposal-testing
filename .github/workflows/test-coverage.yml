@@ -23,18 +23,20 @@ jobs:
               pull_number: context.payload.inputs.pr_number
             })
             core.setOutput('repo', PR.data.head.repo.full_name)
+            core.setOutput('isDraft', PR.data.draft)
             core.setOutput('ref', PR.data.head.ref)
+
+      - name: Skip Coverage Check for Draft PRs
+        if: steps.get_pr.outputs.isDraft == 'true'
+        run: |
+          echo "PR is a draft, skipping coverage check."
+          exit 0
 
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           repository: ${{ steps.get_pr.outputs.repo }}
           ref: ${{ steps.get_pr.outputs.ref }}
-
-      - name: Add upstream remote for base repo
-        run: |
-          git remote add upstream https://github.com/${{ github.repository }}.git
-          git fetch upstream main
 
       - name: Setup node
         uses: actions/setup-node@v4
