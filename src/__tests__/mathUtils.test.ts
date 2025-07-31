@@ -37,6 +37,8 @@ import {
     sumOfSquares,
     isPerfectNumber,
     logBase,
+    variance,
+    quadraticRoots,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -733,4 +735,39 @@ describe('Math Utils', () => {
         });
     });
 
+});
+
+describe('variance', () => {
+    test('calculates variance for a typical array', () => {
+        expect(variance([1, 2, 3, 4, 5])).toBeCloseTo(2.5);
+    });
+    test('returns 0 for a single-element array', () => {
+        expect(variance([42])).toBe(0);
+    });
+    test('throws error for empty array', () => {
+        expect(() => variance([])).toThrow('Cannot calculate variance of empty array');
+    });
+});
+
+describe('quadraticRoots', () => {
+    test('finds two real roots', () => {
+        const result = quadraticRoots(1, -3, 2); // x^2 - 3x + 2 = 0 => roots 2, 1
+        expect(result.real).toEqual([2, 1]);
+        expect(result.imaginary).toEqual([]);
+    });
+    test('finds one real root (repeated)', () => {
+        const result = quadraticRoots(1, -2, 1); // x^2 - 2x + 1 = 0 => root 1
+        expect(result.real).toEqual([1]);
+        expect(result.imaginary).toEqual([]);
+    });
+    test('finds two complex roots', () => {
+        const result = quadraticRoots(1, 2, 5); // x^2 + 2x + 5 = 0
+        expect(result.real[0]).toBeCloseTo(-1);
+        expect(result.real[1]).toBeCloseTo(-1);
+        expect(result.imaginary[0]).toBeCloseTo(2);
+        expect(result.imaginary[1]).toBeCloseTo(-2);
+    });
+    test('throws error if a is zero', () => {
+        expect(() => quadraticRoots(0, 2, 1)).toThrow('Coefficient "a" cannot be zero for quadratic equation');
+    });
 });
