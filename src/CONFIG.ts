@@ -38,7 +38,7 @@ export default {
     },
     CAPTURE_METRICS: get(Config, 'CAPTURE_METRICS', 'false') === 'true',
     ONYX_METRICS: get(Config, 'ONYX_METRICS', 'false') === 'true',
-    DEV_PORT: process.env.PORT ?? 8082,
+    DEV_PORT: 8082,
     E2E_TESTING: get(Config, 'E2E_TESTING', 'false') === 'true',
     SEND_CRASH_REPORTS: get(Config, 'SEND_CRASH_REPORTS', 'false') === 'true',
     APPLE_SIGN_IN: {
@@ -58,5 +58,7 @@ export default {
     // to read more about StrictMode see: contributingGuides/STRICT_MODE.md
     USE_REACT_STRICT_MODE_IN_DEV: false,
     ELECTRON_DISABLE_SECURITY_WARNINGS: 'true',
-    IS_TEST_ENV: process.env.NODE_ENV === 'test',
+    IS_TEST_ENV: 'test',
+    // Added new config line for demonstration
+    NEW_CONFIG_LINE: 'demo-config',
 } as const;

@@ -41,6 +41,9 @@ const LOCALES = {
     ...BETA_LOCALES,
 } as const;
 
+// Added for demonstration purposes
+const NEW_LOCALE_EXAMPLE = 'example-locale';
+
 /**
  * Locales that are valid translation targets. This does not include English, because it's used as the source of truth.
  */
@@ -87,6 +90,7 @@ export {
     FULLY_SUPPORTED_LOCALES,
     LOCALES,
     LOCALE_TO_LANGUAGE_STRING,
+    NEW_LOCALE_EXAMPLE,
     SORTED_LOCALES,
     TRANSLATION_TARGET_LOCALES,
     isSupportedLocale,
