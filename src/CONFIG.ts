@@ -30,6 +30,7 @@ export default {
     PUSHER: {
         APP_KEY: get(Config, 'PUSHER_APP_KEY', '268df511a204fbb60884'),
         CLUSTER: 'mt1',
+        CLUSTER2: 'mt2',
     },
     SITE_TITLE: 'New Expensify',
     FAVICON: {
