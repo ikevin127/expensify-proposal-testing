@@ -31828,6 +31828,11 @@ function generateCoverageData(coverage, changedFiles, baseCoverage) {
         };
     }
 
+    console.log('DEBUG: Changed files:', changedFiles);
+    console.log('DEBUG: Coverage keys:', Object.keys(coverage).filter(k => k !== 'total'));
+    console.log('DEBUG: File being processed:', file);
+    console.log('DEBUG: FileCoverage found:', !!fileCoverage);
+
     return result;
 }
 
