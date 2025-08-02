@@ -31907,7 +31907,8 @@ function generateCoverageSection(coverageData, artifactUrl, workflowRunId) {
 {{#hasChangedFiles}}
 | File | Coverage | Lines |
 |------|----------|-------|
-{{#changedFiles}}| \`{{displayFile}}\` | {{coverage}}% | {{lines}} |{{/changedFiles}}
+{{#changedFiles}}| \`{{displayFile}}\` | {{coverage}}% | {{lines}} |
+{{/changedFiles}}
 {{/hasChangedFiles}}
 {{^hasChangedFiles}}*No coverage changed files found.*{{/hasChangedFiles}}
 **🔄 Overall Coverage Summary**
