@@ -37,6 +37,8 @@ import {
     sumOfSquares,
     isPerfectNumber,
     logBase,
+    absoluteDifference,
+    isOdd,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -816,6 +818,28 @@ describe('Math Utils', () => {
         test('should throw error for invalid bases', () => {
             expect(() => logBase(10, 0)).toThrow('Base must be positive and not equal to 1');
             expect(() => logBase(10, 1)).toThrow('Base must be positive and not equal to 1');
+        });
+    });
+
+    describe('absoluteDifference', () => {
+        test('should calculate absolute difference between two numbers', () => {
+            expect(absoluteDifference(5, 3)).toBe(2);
+            expect(absoluteDifference(3, 5)).toBe(2);
+            expect(absoluteDifference(-3, 5)).toBe(8);
+            expect(absoluteDifference(0, 0)).toBe(0);
+        });
+    });
+
+    describe('isOdd', () => {
+        test('should return true for odd numbers', () => {
+            expect(isOdd(1)).toBe(true);
+            expect(isOdd(-3)).toBe(true);
+        });
+
+        test('should return false for even numbers', () => {
+            expect(isOdd(2)).toBe(false);
+            expect(isOdd(0)).toBe(false);
+            expect(isOdd(-4)).toBe(false);
         });
     });
 

@@ -585,3 +585,17 @@ export function quadraticRoots(a: number, b: number, c: number): { real: number[
         };
     }
 }
+
+/**
+ * Returns the absolute difference between two numbers
+ */
+export function absoluteDifference(a: number, b: number): number {
+    return Math.abs(a - b);
+}
+
+/**
+ * Returns true if a number is odd
+ */
+export function isOdd(n: number): boolean {
+    return n % 2 !== 0;
+}

@@ -28,3 +28,13 @@ export default function requireParameters(parameterNames: string[], parameters: 
         throw new Error(error);
     });
 }
+
+// Untested: Returns the first parameter
+export function getFirstParameter(...args: any[]): any {
+    return args[0];
+}
+
+// Untested: Returns the number of parameters
+export function countParameters(...args: any[]): number {
+    return args.length;
+}
