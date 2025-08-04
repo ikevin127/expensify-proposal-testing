@@ -27,4 +27,13 @@ export default {
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)'
   ],
+  reporters: [
+    'default',
+    ['jest-junit', {
+      classNameTemplate: '{filepath}',
+      titleTemplate: '{title}',
+      ancestorSeparator: ' › ',
+      usePathForSuiteName: true
+    }]
+  ],
 };
