@@ -6,6 +6,7 @@ import {utcToZonedTime} from 'date-fns-tz';
 import CONST from './libs/CONST';
 import OpenAIUtils from './libs/OpenAIUtils';
 import {GitHubType} from './libs/OpenAIUtils';
+import {TupleToUnion} from 'type-fest';
 
 type AssistantResponse = {
     action: typeof CONST.NO_ACTION | typeof CONST.ACTION_REQUIRED;
@@ -98,8 +99,9 @@ class ProposalPoliceTemplates {
         return '#### 🚫 Duplicated proposal withdrawn by 🤖 ProposalPolice.';
     }
 
-    static getDuplicateCheckNoticeMessage(proposalAuthor: string): string {
-        return `⚠️ @${proposalAuthor} Your proposal is a duplicate of an already existing proposal and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.`;
+    static getDuplicateCheckNoticeMessage(proposalAuthor: string, originalProposalURL?: string): string {
+        const existingProposalWithURL = originalProposalURL ? `[existing proposal](${originalProposalURL})` : 'existing proposal';
+        return `⚠️ @${proposalAuthor} Your proposal is a duplicate of an already ${existingProposalWithURL} and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.`;
     }
 }
 
@@ -174,6 +176,7 @@ async function run() {
         );
 
         let didFindDuplicate = false;
+        let originalProposal: TupleToUnion<typeof previousProposals> | undefined;
         for (const previousProposal of previousProposals) {
             const isNotAProposal = !previousProposal.body || !previousProposal.body.includes(CONST.PROPOSAL_KEYWORD)
             const isAuthorBot = previousProposal.user?.login === CONST.LABELS.GITHUB_ACTIONS || previousProposal.user?.type === CONST.LABELS.BOT;
@@ -195,13 +198,14 @@ async function run() {
             if (similarityPercentage >= 90) {
                 console.log(`Found duplicate with ${similarityPercentage}% similarity.`);
                 didFindDuplicate = true;
+                originalProposal = previousProposal;
                 break;
             }
         }
 
         if (didFindDuplicate) {
             const duplicateCheckWithdrawMessage = ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage();
-            const duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor);
+            const duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor, originalProposal?.html_url);
             // If a duplicate proposal is detected, update the comment to withdraw it
             console.log('ProposalPolice™ withdrawing duplicated proposal...');
             await octokit.issues.updateComment({

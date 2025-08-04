@@ -131,8 +131,9 @@ var ProposalPoliceTemplates = /** @class */ (function () {
     ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage = function () {
         return '#### 🚫 Duplicated proposal withdrawn by 🤖 ProposalPolice.';
     };
-    ProposalPoliceTemplates.getDuplicateCheckNoticeMessage = function (proposalAuthor) {
-        return "\u26A0\uFE0F @".concat(proposalAuthor, " Your proposal is a duplicate of an already existing proposal and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.");
+    ProposalPoliceTemplates.getDuplicateCheckNoticeMessage = function (proposalAuthor, originalProposalURL) {
+        var existingProposalWithURL = originalProposalURL ? "[existing proposal](".concat(originalProposalURL, ")") : 'existing proposal';
+        return "\u26A0\uFE0F @".concat(proposalAuthor, " Your proposal is a duplicate of an already ").concat(existingProposalWithURL, " and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.");
     };
     return ProposalPoliceTemplates;
 }());
@@ -140,7 +141,7 @@ var ProposalPoliceTemplates = /** @class */ (function () {
 // @ts-ignore - all good
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var now, zonedDate, formattedDate, octokit, payload, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, didFindDuplicate, _i, previousProposals_1, previousProposal, isNotAProposal, isAuthorBot, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _a, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, prompt, assistantResponse, parsedAssistantResponse, _b, _c, action, _d, message, isNoAction, isActionEdit, isActionRequired, formattedResponse, formattedResponse;
+        var now, zonedDate, formattedDate, octokit, payload, issueNumber, commentID, newProposalCreatedAt_1, newProposalBody, newProposalAuthor, commentsResponse, previousProposals, didFindDuplicate, originalProposal, _i, previousProposals_1, previousProposal, isNotAProposal, isAuthorBot, duplicateCheckPrompt, duplicateCheckResponse, similarityPercentage, parsedDuplicateCheckResponse, _a, similarity, duplicateCheckWithdrawMessage, duplicateCheckNoticeMessage, prompt, assistantResponse, parsedAssistantResponse, _b, _c, action, _d, message, isNoAction, isActionEdit, isActionRequired, formattedResponse, formattedResponse;
         var _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1;
         return __generator(this, function (_2) {
             switch (_2.label) {
@@ -197,6 +198,7 @@ function run() {
                             comment.body.includes(CONST_1.default.PROPOSAL_KEYWORD);
                     });
                     didFindDuplicate = false;
+                    originalProposal = void 0;
                     _i = 0, previousProposals_1 = previousProposals;
                     _2.label = 2;
                 case 2:
@@ -224,6 +226,7 @@ function run() {
                     if (similarityPercentage >= 90) {
                         console.log("Found duplicate with ".concat(similarityPercentage, "% similarity."));
                         didFindDuplicate = true;
+                        originalProposal = previousProposal;
                         return [3 /*break*/, 5];
                     }
                     _2.label = 4;
@@ -233,7 +236,7 @@ function run() {
                 case 5:
                     if (!didFindDuplicate) return [3 /*break*/, 8];
                     duplicateCheckWithdrawMessage = ProposalPoliceTemplates.getDuplicateCheckWithdrawMessage();
-                    duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor);
+                    duplicateCheckNoticeMessage = ProposalPoliceTemplates.getDuplicateCheckNoticeMessage(newProposalAuthor, originalProposal === null || originalProposal === void 0 ? void 0 : originalProposal.html_url);
                     // If a duplicate proposal is detected, update the comment to withdraw it
                     console.log('ProposalPolice™ withdrawing duplicated proposal...');
                     return [4 /*yield*/, octokit.issues.updateComment(__assign(__assign({}, github_1.context.repo), { comment_id: commentID, body: duplicateCheckWithdrawMessage }))];
