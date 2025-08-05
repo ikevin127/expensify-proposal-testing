@@ -28,3 +28,17 @@ export default function requireParameters(parameterNames: string[], parameters: 
         throw new Error(error);
     });
 }
+
+export function requireParametersWithOptionalAuthToken(
+    parameterNames: string[],
+    parameters: Record<string, unknown>,
+    commandName: string,
+): void {
+    if (parameterNames.includes('authToken')) {
+        parameterNames = parameterNames.filter((name) => name !== 'authToken');
+        requireParameters(parameterNames, parameters, commandName);
+        return;
+    }
+
+    requireParameters(parameterNames, parameters, commandName);
+}
