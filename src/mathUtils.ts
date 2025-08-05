@@ -597,7 +597,7 @@ export function variance(numbers: number[]): number {
 }
 
 /**
- * Find the roots of a quadratic equation ax² + bx + c = 0 (UNTESTED)
+ * Find the roots of a quadratic equation ax² + bx + c = 0 (UNTESTED COMMENT)
  */
 export function quadraticRoots(a: number, b: number, c: number): { real: number[], imaginary: number[] } {
     if (a === 0) {
