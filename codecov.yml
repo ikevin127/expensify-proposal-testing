@@ -12,7 +12,7 @@ coverage:
         informational: true
 
 comment:
-  layout: "diff, files"
+  layout: "header, summary, diff, files"
   behavior: default
   require_changes: false
   require_base: false
