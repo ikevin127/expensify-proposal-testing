@@ -28,6 +28,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Get PR head SHA
+        if: github.event.inputs.pr_number
+        id: pr-head
+        run: |
+          PR_HEAD_SHA=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.inputs.pr_number }} --jq '.head.sha')
+          echo "sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run tests
         run: npm run test:ci
 
@@ -36,7 +45,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
-          override_commit: ${{ github.sha }}
+          override_commit: ${{ steps.pr-head.outputs.sha || github.sha }}
           verbose: true
 
       - name: Upload test results to Codecov
@@ -45,5 +54,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
-          override_commit: ${{ github.sha }}
+          override_commit: ${{ steps.pr-head.outputs.sha || github.sha }}
           verbose: true
