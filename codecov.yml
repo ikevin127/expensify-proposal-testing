@@ -12,7 +12,7 @@ coverage:
         informational: true
 
 comment:
-  layout: "header, summary, diff, files"
+  layout: "header, diff, condensed_files, footer"
   behavior: default
   require_changes: false
   require_base: false
@@ -25,7 +25,3 @@ comment:
 
 github_checks:
   annotations: true
-
-ui:
-  hide_sunburst: true
-  hide_search: true
