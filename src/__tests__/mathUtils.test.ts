@@ -37,6 +37,7 @@ import {
     sumOfSquares,
     isPerfectNumber,
     logBase,
+    isArmstrongNumber,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -819,4 +820,30 @@ describe('Math Utils', () => {
         });
     });
 
+    describe('isArmstrongNumber', () => {
+        test('should return true for Armstrong numbers', () => {
+            expect(isArmstrongNumber(153)).toBe(true);
+            expect(isArmstrongNumber(370)).toBe(true);
+            expect(isArmstrongNumber(371)).toBe(true);
+            expect(isArmstrongNumber(9474)).toBe(true);
+        });
+
+        test('should return false for non-Armstrong numbers', () => {
+            expect(isArmstrongNumber(123)).toBe(false);
+            expect(isArmstrongNumber(10)).toBe(false);
+            expect(isArmstrongNumber(1000)).toBe(false);
+        });
+
+        test('should handle single-digit numbers', () => {
+            expect(isArmstrongNumber(0)).toBe(true);
+            expect(isArmstrongNumber(1)).toBe(true);
+            expect(isArmstrongNumber(5)).toBe(true);
+        });
+
+        test('nagative numbers should return false', () => {
+            expect(isArmstrongNumber(-153)).toBe(false);
+            expect(isArmstrongNumber(-370)).toBe(false);
+            expect(isArmstrongNumber(-371)).toBe(false);
+        });
+    })
 });
