@@ -21,7 +21,7 @@ comment:
     - "main"
   hide_project_coverage: false
   show_carryforward_flags: false
-  after_n_builds: 1
+  hide_comment_details: false
 
 github_checks:
   annotations: true
