@@ -54,7 +54,7 @@ jobs:
       - run: npm install
 
       - name: Run Jest shard ${{ matrix.shard }}
-        run: npm run test:ci -- --shard=${{ matrix.shard }}
+        run: npm run test:ci -- --shard=${{ matrix.shard }}/3
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
