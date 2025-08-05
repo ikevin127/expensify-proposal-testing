@@ -641,7 +641,7 @@ export function isArmstrongNumber(num: number): boolean {
 
 export function nthRoot(value: number, n: number): number {
     if (n <= 0) {
-        throw new Error('Root degree must be a positive integer');
+        throw new Error('Root must be a positive integer');
     }
     
     if (value < 0 && n % 2 === 0) {

@@ -37,6 +37,7 @@ import {
     sumOfSquares,
     isPerfectNumber,
     logBase,
+    nthRoot,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -819,4 +820,22 @@ describe('Math Utils', () => {
         });
     });
 
+    describe('nthRoot', () => {
+        test('should calculate nth root of a number', () => {
+            expect(nthRoot(27, 3)).toBeCloseTo(3, 5);
+            expect(nthRoot(16, 4)).toBeCloseTo(2, 5);
+            expect(nthRoot(81, 4)).toBeCloseTo(3, 5);
+        });
+
+        test('should handle zero and one roots', () => {
+            expect(nthRoot(0, 2)).toBe(0);
+            expect(nthRoot(1, 2)).toBe(1);
+            expect(nthRoot(1, 3)).toBe(1);
+        });
+
+        test('should throw error for invalid roots', () => {
+            expect(() => nthRoot(27, -3)).toThrow('Root must be a positive integer');
+            expect(() => nthRoot(16, 0)).toThrow('Root must be a positive integer');
+        });
+    })
 });
