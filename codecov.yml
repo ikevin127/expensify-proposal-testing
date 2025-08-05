@@ -24,16 +24,8 @@ comment:
   after_n_builds: 1
 
 github_checks:
-  annotations: false
+  annotations: true
 
 ui:
   hide_sunburst: true
   hide_search: true
-
-parsers:
-  gcov:
-    branch_detection:
-      conditional: yes
-      loop: yes
-      method: no
-      macro: no
