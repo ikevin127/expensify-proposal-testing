@@ -1,4 +1,44 @@
 /**
+ * Calculate the nth triangular number
+ */
+export function triangularNumber(n: number): number {
+    return (n * (n + 1)) / 2;
+}
+
+/**
+ * Generate prime numbers up to a limit
+ */
+export function generatePrimes(limit: number): number[] {
+    const sieve = [];
+    const primes = [];
+    for (let i = 2; i <= limit; i++) {
+        if (!sieve[i]) {
+            primes.push(i);
+            for (let j = i * i; j <= limit; j += i) {
+                sieve[j] = true;
+            }
+        }
+    }
+    return primes;
+}
+
+/**
+ * Reverse the digits of a number
+ */
+export function reverseNumber(num: number): number {
+    const isNegative = num < 0;
+    num = Math.abs(num);
+    
+    let reversed = 0;
+    while (num > 0) {
+        reversed = reversed * 10 + (num % 10);
+        num = Math.floor(num / 10);
+    }
+    
+    return isNegative ? -reversed : reversed;
+}
+
+/**
  * Mathematical utility functions for testing coverage
  */
 
