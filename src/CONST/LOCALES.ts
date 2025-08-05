@@ -60,6 +60,7 @@ const LOCALE_TO_LANGUAGE_STRING = {
     [BETA_LOCALES.PL]: 'Polski',
     [BETA_LOCALES.PT_BR]: 'Português (BR)',
     [BETA_LOCALES.ZH_HANS]: '中文 (简体)',
+    [EXTENDED_LOCALES.ES_ES_ONFIDO]: 'Español (España)',
 } as const;
 
 type FullySupportedLocale = ValueOf<typeof FULLY_SUPPORTED_LOCALES>;
