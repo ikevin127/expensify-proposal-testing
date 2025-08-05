@@ -38,6 +38,7 @@ import {
     isPerfectNumber,
     logBase,
     nthRoot,
+    isHarshadNumber,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -836,6 +837,30 @@ describe('Math Utils', () => {
         test('should throw error for invalid roots', () => {
             expect(() => nthRoot(27, -3)).toThrow('Root must be a positive integer');
             expect(() => nthRoot(16, 0)).toThrow('Root must be a positive integer');
+        });
+    })
+
+    describe('isHarshadNumber', () => {
+        test('should return true for Harshad numbers', () => {
+            expect(isHarshadNumber(18)).toBe(true);
+            expect(isHarshadNumber(21)).toBe(true);
+            expect(isHarshadNumber(12)).toBe(true);
+        });
+
+        test('should return false for non-Harshad numbers', () => {
+            expect(isHarshadNumber(19)).toBe(false);
+            expect(isHarshadNumber(22)).toBe(false);
+            expect(isHarshadNumber(13)).toBe(false);
+        });
+
+        test('should handle single-digit numbers', () => {
+            expect(isHarshadNumber(5)).toBe(true);
+            expect(isHarshadNumber(7)).toBe(true);
+            expect(isHarshadNumber(9)).toBe(true);
+        });
+
+        test('should handle zero', () => {
+            expect(isHarshadNumber(0)).toBe(false); // 0 is not a Harshad number
         });
     })
 });
