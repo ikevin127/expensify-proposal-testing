@@ -839,5 +839,11 @@ describe('Math Utils', () => {
             expect(isArmstrongNumber(1)).toBe(true);
             expect(isArmstrongNumber(5)).toBe(true);
         });
+
+        test('nagative numbers should return false', () => {
+            expect(isArmstrongNumber(-153)).toBe(false);
+            expect(isArmstrongNumber(-370)).toBe(false);
+            expect(isArmstrongNumber(-371)).toBe(false);
+        });
     })
 });
