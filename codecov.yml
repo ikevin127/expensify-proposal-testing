@@ -1,12 +1,14 @@
 coverage:
   status:
     project:
-      default: off
+      default:
+        enabled: true
     patch:
-      default: off
+      default:
+        enabled: true
 
 comment:
-  layout: "newheader, diff, files, newfooter"
+  layout: "newheader, diff, files, tree, newfooter"
   behavior: default
   require_changes: false
   require_base: false
