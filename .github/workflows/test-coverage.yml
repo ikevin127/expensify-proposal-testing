@@ -61,13 +61,6 @@ jobs:
           cache: "npm"
       - run: npm ci
 
-      - name: Cache Jest cache
-        id: cache-jest-cache
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57
-        with:
-          path: .jest-cache
-          key: ${{ runner.os }}-jest
-
       - name: Run Jest Coverage Shard ${{ matrix.shard }}
         run: npm test -- --coverage --silent --passWithNoTests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --max-workers ${{ needs.setup.outputs.cpu_cores }}
 
