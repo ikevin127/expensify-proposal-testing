@@ -50,6 +50,7 @@ export default {
         IOS_CLIENT_ID: '921154746561-s3uqn2oe4m85tufi6mqflbfbuajrm2i3.apps.googleusercontent.com',
     },
     GCP_GEOLOCATION_API_KEY: googleGeolocationAPIKey,
+    GCP_GEOLOCATION_API_URL: `https://geolocation.googleapis.com/v1/geolocate?key=${googleGeolocationAPIKey}`,
     FIREBASE_WEB_CONFIG: {
         apiKey: get(Config, 'FB_API_KEY', 'AIzaSyBrLKgCuo6Vem6Xi5RPokdumssW8HaWBow'),
         appId: get(Config, 'FB_APP_ID', '1:1008697809946:web:ca25268d2645fc285445a3'),

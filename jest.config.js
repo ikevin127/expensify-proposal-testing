@@ -2,7 +2,7 @@ export default {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   transform: {
@@ -17,23 +17,9 @@ export default {
     '!src/**/*.test.{ts,tsx,js,jsx}',
     '!src/**/*.spec.{ts,tsx,js,jsx}',
   ],
-  coverageReporters: [
-    'json-summary',
-    'lcov',
-    'html',
-    'text-summary'
-  ],
+  coverageReporters: ['lcov'],
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)'
-  ],
-  reporters: [
-    'default',
-    ['jest-junit', {
-      classNameTemplate: '{filepath}',
-      titleTemplate: '{title}',
-      ancestorSeparator: ' › ',
-      usePathForSuiteName: true
-    }]
   ],
 };
