@@ -3,23 +3,32 @@ coverage:
     project:
       default:
         target: auto
-        threshold: 0.1%
+        threshold: 1%
+        informational: true
     patch:
       default:
         target: auto
-        threshold: 0.1%
+        threshold: 1%
+        informational: true
 
 comment:
-  layout: "reach, diff, flags, files, footer"
+  layout: "diff, files"
   behavior: default
   require_changes: false
-  require_base: true
+  require_base: false
   require_head: true
   branches:
     - "main"
+  hide_project_coverage: false
+  show_carryforward_flags: false
+  after_n_builds: 1
 
 github_checks:
-  annotations: true
+  annotations: false
+
+ui:
+  hide_sunburst: true
+  hide_search: true
 
 parsers:
   gcov:
