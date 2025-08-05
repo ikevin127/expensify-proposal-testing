@@ -12,10 +12,9 @@ export default {
   },
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx,js,jsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.{ts,tsx,js,jsx}',
-    '!src/**/*.spec.{ts,tsx,js,jsx}',
+    "src/**/*.{ts,tsx,js,jsx}",
+    "!**/node_modules/**",
+    "!**/coverage/**",
   ],
   coverageReporters: [
     'json-summary',
@@ -26,14 +25,5 @@ export default {
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)'
-  ],
-  reporters: [
-    'default',
-    ['jest-junit', {
-      classNameTemplate: '{filepath}',
-      titleTemplate: '{title}',
-      ancestorSeparator: ' › ',
-      usePathForSuiteName: true
-    }]
   ],
 };
