@@ -87,3 +87,20 @@ export function requireParametersWithOptionalAuthTokenAndPartnerUserSecret(
     }
     requireParameters(parameterNames, parameters, commandName);
 }
+
+export function requireParametersWithOptionalAuthTokenAndPasswordAndPartnerUserSecret(
+    parameterNames: string[],
+    parameters: Record<string, unknown>,
+    commandName: string,
+): void {
+    if (parameterNames.includes('authToken')) {
+        parameterNames = parameterNames.filter((name) => name !== 'authToken');
+    }
+    if (parameterNames.includes('password')) {
+        parameterNames = parameterNames.filter((name) => name !== 'password');
+    }
+    if (parameterNames.includes('partnerUserSecret')) {
+        parameterNames = parameterNames.filter((name) => name !== 'partnerUserSecret');
+    }
+    requireParameters(parameterNames, parameters, commandName);
+}

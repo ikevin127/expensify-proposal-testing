@@ -33,6 +33,7 @@ const EXTENDED_LOCALES = {
     ES_ES_ONFIDO: 'es_ES',
     ES_MX_ONFIDO: 'es_MX',
     ES_US_ONFIDO: 'es_US',
+    FR_CA_ONFIDO: 'fr_CA',
 } as const;
 
 /**

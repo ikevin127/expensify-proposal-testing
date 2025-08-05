@@ -35,6 +35,7 @@ export default {
     SITE_TITLE_SHORT: 'EXFY',
     SITE_NAME: 'Expensify',
     SITE_URL: get(Config, 'SITE_URL', 'https://chat.expensify.com'),
+    SITE_URL_DEV: get(Config, 'SITE_URL_DEV', 'https://chat.dev.expensify.com'),
     FAVICON: {
         DEFAULT: '/favicon.png',
         UNREAD: '/favicon-unread.png',

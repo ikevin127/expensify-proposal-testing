@@ -714,3 +714,22 @@ export function isAbundantNumber(n: number): boolean {
     
     return sumOfDivisors > n; // Abundant if sum of proper divisors is greater than n
 }
+
+export function isDeficientNumber(n: number): boolean {
+    if (n <= 0) {
+        return false; // Deficient numbers are positive integers
+    }
+    
+    let sumOfDivisors = 1; // Start with 1, which is a proper divisor for all n > 1
+    
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i === 0) {
+            sumOfDivisors += i;
+            if (i !== n / i) {
+                sumOfDivisors += n / i; // Add the corresponding divisor
+            }
+        }
+    }
+    
+    return sumOfDivisors < n; // Deficient if sum of proper divisors is less than n
+}
