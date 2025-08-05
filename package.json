@@ -4,7 +4,7 @@
   "description": "Testing repository for Expensify proposals",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --reporters=default --reporters=jest-junit"
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",

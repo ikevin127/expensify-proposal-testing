@@ -54,7 +54,7 @@ jobs:
       - run: npm install
 
       - name: Run Jest Shard ${{ matrix.shard }}
-        run: npm run test:ci -- --shard=${{ matrix.shard }}/3 --passWithNoTests
+        run: npm run test:coverage -- --shard=${{ matrix.shard }}/3 --passWithNoTests
 
       - name: Check If Coverage Is Empty
         id: check-coverage
