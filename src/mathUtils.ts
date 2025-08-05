@@ -625,3 +625,16 @@ export function quadraticRoots(a: number, b: number, c: number): { real: number[
         };
     }
 }
+
+export function isArmstrongNumber(num: number): boolean {
+    if (num < 0) {
+        return false; // Armstrong numbers are non-negative
+    }
+    
+    const digits = num.toString().split('').map(Number);
+    const numDigits = digits.length;
+    
+    const sum = digits.reduce((acc, digit) => acc + Math.pow(digit, numDigits), 0);
+    
+    return sum === num;
+}
