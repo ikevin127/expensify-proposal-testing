@@ -907,7 +907,7 @@ describe('Math Utils', () => {
         test('should handle small numbers', () => {
             expect(isSphenicNumber(1)).toBe(false);
             expect(isSphenicNumber(2)).toBe(false);
-            expect(isSphenicNumber(6)).toBe(true); // 6 = 2 * 3
+            expect(isSphenicNumber(6)).toBe(false);
         });
     })
 });
