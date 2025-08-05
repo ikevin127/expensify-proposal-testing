@@ -695,3 +695,22 @@ export function isHarshadNumber(n: number): boolean {
     
     return n % sumOfDigits === 0;
 }
+
+export function isAbundantNumber(n: number): boolean {
+    if (n <= 0) {
+        return false; // Abundant numbers are positive integers
+    }
+    
+    let sumOfDivisors = 1; // Start with 1, which is a proper divisor for all n > 1
+    
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i === 0) {
+            sumOfDivisors += i;
+            if (i !== n / i) {
+                sumOfDivisors += n / i; // Add the corresponding divisor
+            }
+        }
+    }
+    
+    return sumOfDivisors > n; // Abundant if sum of proper divisors is greater than n
+}

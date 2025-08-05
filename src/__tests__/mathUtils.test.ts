@@ -39,6 +39,7 @@ import {
     logBase,
     nthRoot,
     isHarshadNumber,
+    isAbundantNumber,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -861,6 +862,30 @@ describe('Math Utils', () => {
 
         test('should handle zero', () => {
             expect(isHarshadNumber(0)).toBe(false); // 0 is not a Harshad number
+        });
+    })
+
+    describe('isAbundantNumber', () => {
+        test('should return true for abundant numbers', () => {
+            expect(isAbundantNumber(12)).toBe(true);
+            expect(isAbundantNumber(18)).toBe(true);
+            expect(isAbundantNumber(20)).toBe(true);
+        });
+
+        test('should return false for non-abundant numbers', () => {
+            expect(isAbundantNumber(6)).toBe(false);
+            expect(isAbundantNumber(10)).toBe(false);
+            expect(isAbundantNumber(15)).toBe(false);
+        });
+
+        test('should handle perfect numbers', () => {
+            expect(isAbundantNumber(28)).toBe(false); // 28 is a perfect number
+        });
+
+        test('should handle small numbers', () => {
+            expect(isAbundantNumber(1)).toBe(false);
+            expect(isAbundantNumber(2)).toBe(false);
+            expect(isAbundantNumber(3)).toBe(false);
         });
     })
 });
