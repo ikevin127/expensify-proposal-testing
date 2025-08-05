@@ -79,8 +79,17 @@ jobs:
           files: coverage/lcov.info
           verbose: true
 
+      - name: Check If Test Results Exist
+        id: check-results
+        run: |
+          if [ -s junit.xml ]; then
+            echo "hasResults=true" >> $GITHUB_OUTPUT
+          else
+            echo "hasResults=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload Test Results to Codecov
-        if: ${{ !cancelled() }} && steps.check-coverage.outputs.hasCoverage == 'true'
+        if: ${{ steps.check-results.outputs.hasResults == 'true' }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
