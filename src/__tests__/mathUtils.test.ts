@@ -37,6 +37,8 @@ import {
     sumOfSquares,
     isPerfectNumber,
     logBase,
+    variance,
+    quadraticRoots,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -816,6 +818,125 @@ describe('Math Utils', () => {
         test('should throw error for invalid bases', () => {
             expect(() => logBase(10, 0)).toThrow('Base must be positive and not equal to 1');
             expect(() => logBase(10, 1)).toThrow('Base must be positive and not equal to 1');
+        });
+    });
+
+    describe('variance', () => {
+        test('should calculate variance for a set of numbers', () => {
+            expect(variance([1, 2, 3, 4, 5])).toBeCloseTo(2.5, 5);
+            expect(variance([10, 12, 14, 16, 18])).toBeCloseTo(10, 5);
+            expect(variance([2, 4, 6])).toBeCloseTo(4, 5);
+        });
+
+        test('should return 0 for single number', () => {
+            expect(variance([5])).toBe(0);
+            expect(variance([100])).toBe(0);
+            expect(variance([-10])).toBe(0);
+        });
+
+        test('should handle negative numbers', () => {
+            expect(variance([-1, -2, -3, -4, -5])).toBeCloseTo(2.5, 5);
+            expect(variance([-10, 0, 10])).toBeCloseTo(100, 5);
+        });
+
+        test('should handle decimal values', () => {
+            expect(variance([1.5, 2.5, 3.5])).toBeCloseTo(1, 5);
+            expect(variance([0.1, 0.2, 0.3, 0.4])).toBeCloseTo(0.01666666666666667, 10);
+        });
+
+        test('should handle identical values', () => {
+            expect(variance([5, 5, 5, 5])).toBe(0);
+            expect(variance([0, 0, 0])).toBe(0);
+            expect(variance([-3, -3, -3, -3, -3])).toBe(0);
+        });
+
+        test('should throw error for empty array', () => {
+            expect(() => variance([])).toThrow('Cannot calculate variance of empty array');
+        });
+
+        test('should handle large datasets', () => {
+            const largeArray = Array.from({length: 1000}, (_, i) => i + 1);
+            const result = variance(largeArray);
+            expect(result).toBeGreaterThan(0);
+            expect(typeof result).toBe('number');
+        });
+    });
+
+    describe('quadraticRoots', () => {
+        test('should find two real roots when discriminant > 0', () => {
+            const result = quadraticRoots(1, -5, 6); // x² - 5x + 6 = 0
+            expect(result.real).toHaveLength(2);
+            expect(result.imaginary).toHaveLength(0);
+            expect(result.real).toEqual(expect.arrayContaining([3, 2]));
+        });
+
+        test('should find one real root when discriminant = 0', () => {
+            const result = quadraticRoots(1, -4, 4); // x² - 4x + 4 = 0 (perfect square)
+            expect(result.real).toHaveLength(1);
+            expect(result.imaginary).toHaveLength(0);
+            expect(result.real[0]).toBeCloseTo(2, 5);
+        });
+
+        test('should find complex roots when discriminant < 0', () => {
+            const result = quadraticRoots(1, 0, 1); // x² + 1 = 0
+            expect(result.real).toHaveLength(2);
+            expect(result.imaginary).toHaveLength(2);
+            expect(result.real[0]).toBeCloseTo(0, 5);
+            expect(result.real[1]).toBeCloseTo(0, 5);
+            expect(result.imaginary[0]).toBeCloseTo(1, 5);
+            expect(result.imaginary[1]).toBeCloseTo(-1, 5);
+        });
+
+        test('should handle different coefficients', () => {
+            const result = quadraticRoots(2, -8, 6); // 2x² - 8x + 6 = 0
+            expect(result.real).toHaveLength(2);
+            expect(result.imaginary).toHaveLength(0);
+            expect(result.real).toEqual(expect.arrayContaining([3, 1]));
+        });
+
+        test('should handle negative coefficients', () => {
+            const result = quadraticRoots(-1, 2, 3); // -x² + 2x + 3 = 0
+            expect(result.real).toHaveLength(2);
+            expect(result.imaginary).toHaveLength(0);
+            expect(result.real).toEqual(expect.arrayContaining([3, -1]));
+        });
+
+        test('should handle complex roots with non-zero real part', () => {
+            const result = quadraticRoots(1, -2, 5); // x² - 2x + 5 = 0
+            expect(result.real).toHaveLength(2);
+            expect(result.imaginary).toHaveLength(2);
+            expect(result.real[0]).toBeCloseTo(1, 5);
+            expect(result.real[1]).toBeCloseTo(1, 5);
+            expect(result.imaginary[0]).toBeCloseTo(2, 5);
+            expect(result.imaginary[1]).toBeCloseTo(-2, 5);
+        });
+
+        test('should throw error when coefficient a is zero', () => {
+            expect(() => quadraticRoots(0, 2, 3)).toThrow('Coefficient "a" cannot be zero for quadratic equation');
+            expect(() => quadraticRoots(0, 0, 5)).toThrow('Coefficient "a" cannot be zero for quadratic equation');
+            expect(() => quadraticRoots(0, -1, 0)).toThrow('Coefficient "a" cannot be zero for quadratic equation');
+        });
+
+        test('should handle edge cases with zero coefficients', () => {
+            const result1 = quadraticRoots(1, 0, 0); // x² = 0
+            expect(result1.real).toHaveLength(1);
+            expect(result1.real[0]).toBe(-0);
+
+            const result2 = quadraticRoots(1, 0, -4); // x² - 4 = 0
+            expect(result2.real).toHaveLength(2);
+            expect(result2.real).toEqual(expect.arrayContaining([2, -2]));
+
+            const result3 = quadraticRoots(1, -3, 0); // x² - 3x = 0
+            expect(result3.real).toHaveLength(2);
+            expect(result3.real).toEqual(expect.arrayContaining([3, 0]));
+        });
+
+        test('should handle decimal coefficients', () => {
+            const result = quadraticRoots(0.5, -1.5, 1); // 0.5x² - 1.5x + 1 = 0
+            expect(result.real).toHaveLength(2);
+            expect(result.imaginary).toHaveLength(0);
+            expect(result.real[0]).toBeCloseTo(2, 5);
+            expect(result.real[1]).toBeCloseTo(1, 5);
         });
     });
 
