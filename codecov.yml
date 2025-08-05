@@ -9,7 +9,7 @@ comment:
   layout: "newheader, diff, files, newfooter"
   behavior: default
   require_changes: false
-  require_base: true
+  require_base: false
   require_head: true
   hide_comment_details: true
   after_n_builds: 1
