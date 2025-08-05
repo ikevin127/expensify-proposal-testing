@@ -56,7 +56,11 @@ jobs:
       - name: Run Jest shard ${{ matrix.shard }}
         run: npm run test:ci -- --shard=${{ matrix.shard }}/3 --passWithNoTests
 
-      - name: Upload coverage to Codecov
+      - name: Show coverage
+        run: ls -R coverage || echo "No coverage directory"
+
+      - name: Upload coverage to Codecov (if exists)
+        if: success() && hashFiles('coverage/lcov.info') != ''
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
