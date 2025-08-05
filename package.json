@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Testing repository for Expensify proposals",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",
