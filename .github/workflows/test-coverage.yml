@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pr_sha: ${{ steps.pr-head.outputs.sha }}
+      cpu_cores: ${{ steps.cpu-cores.outputs.count }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,7 +22,7 @@ jobs:
           fetch-depth: 2
           ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/merge', github.event.inputs.pr_number) || github.ref }}
 
-      - name: Set up Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "18"
@@ -30,12 +31,16 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Get Number of CPU Cores
+        id: cpu-cores
+        uses: SimenB/github-actions-cpu-cores@31e91de0f8654375a21e8e83078be625380e2b18
+
       - name: Get PR Head SHA
         if: github.event.inputs.pr_number
         id: pr-head
         run: |
-          PR_HEAD_SHA=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.inputs.pr_number }} --jq '.head.sha')
-          echo "sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
+          PR_HEAD_SHA="$(gh api repos/${{ github.repository }}/pulls/${{ github.event.inputs.pr_number }} --jq '.head.sha')"
+          echo "sha=$PR_HEAD_SHA" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -56,16 +61,23 @@ jobs:
           cache: "npm"
       - run: npm ci
 
-      - name: Run Jest Shard ${{ matrix.shard }}
-        run: npm run test:coverage -- --shard=${{ matrix.shard }}/3 --passWithNoTests
+      - name: Cache Jest cache
+        id: cache-jest-cache
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57
+        with:
+          path: .jest-cache
+          key: ${{ runner.os }}-jest
+
+      - name: Run Jest Coverage Shard ${{ matrix.shard }}
+        run: npm test -- --coverage --silent --passWithNoTests --shard=${{ matrix.shard }}/${{ strategy.job-total }} --max-workers ${{ needs.setup.outputs.cpu_cores }}
 
       - name: Check If Coverage Is Empty
         id: check-coverage
         run: |
-          if [ -s coverage/lcov.info ]; then
-            echo "hasCoverage=true" >> $GITHUB_OUTPUT
+          if [ -s "coverage/lcov.info" ]; then
+            echo "hasCoverage=true" >> "$GITHUB_OUTPUT"
           else
-            echo "hasCoverage=false" >> $GITHUB_OUTPUT
+            echo "hasCoverage=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Upload Coverage to Codecov
@@ -82,10 +94,10 @@ jobs:
       - name: Check If Test Results Exist
         id: check-results
         run: |
-          if grep -q "<testcase" junit.xml; then
-            echo "hasResults=true" >> $GITHUB_OUTPUT
+          if grep -q "<testcase" "junit.xml"; then
+            echo "hasResults=true" >> "$GITHUB_OUTPUT"
           else
-            echo "hasResults=false" >> $GITHUB_OUTPUT
+            echo "hasResults=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Upload Test Results to Codecov
