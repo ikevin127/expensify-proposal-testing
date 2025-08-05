@@ -9,9 +9,11 @@ on:
         type: number
 
 jobs:
-  test:
-    name: Run tests and collect coverage
+  setup:
+    name: Install & Prepare
     runs-on: ubuntu-latest
+    outputs:
+      pr_sha: ${{ steps.pr-head.outputs.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,8 +24,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm install
@@ -37,22 +39,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run tests
-        run: npm run test:ci
+  test-shards:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+      - run: npm install
+
+      - name: Run Jest shard ${{ matrix.shard }}
+        run: npm run test:ci -- --shard=${{ matrix.shard }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: shard-${{ matrix.shard }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
-          override_commit: ${{ steps.pr-head.outputs.sha || github.sha }}
-          verbose: true
-
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          override_pr: ${{ github.event.inputs.pr_number || '' }}
-          override_commit: ${{ steps.pr-head.outputs.sha || github.sha }}
+          override_commit: ${{ needs.setup.outputs.pr_sha || github.sha }}
+          files: coverage/lcov.info
           verbose: true
