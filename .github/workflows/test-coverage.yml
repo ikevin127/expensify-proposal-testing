@@ -36,6 +36,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
+          override_commit: ${{ github.sha }}
+          verbose: true
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -43,3 +45,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
+          override_commit: ${{ github.sha }}
+          verbose: true
