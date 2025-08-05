@@ -28,3 +28,17 @@ export default function requireParameters(parameterNames: string[], parameters: 
         throw new Error(error);
     });
 }
+
+export function requireParametersWithRedaction(parameterNames: string[], parameters: Record<string, unknown>, commandName: string): void {
+    const propertiesToRedact = ['authToken', 'password', 'partnerUserSecret', 'twoFactorAuthCode'];
+    const parametersCopy = {...parameters};
+    Object.keys(parametersCopy).forEach((key) => {
+        if (!propertiesToRedact.includes(key.toString())) {
+            return;
+        }
+
+        parametersCopy[key] = '<redacted>';
+    });
+
+    requireParameters(parameterNames, parametersCopy, commandName);
+}
