@@ -625,3 +625,62 @@ export function quadraticRoots(a: number, b: number, c: number): { real: number[
         };
     }
 }
+
+export function isArmstrongNumber(num: number): boolean {
+    if (num < 0) {
+        return false; // Armstrong numbers are non-negative
+    }
+
+    const digits = num.toString().split('').map(Number);
+    const numDigits = digits.length;
+
+    const sum = digits.reduce((acc, digit) => acc + Math.pow(digit, numDigits), 0);
+
+    return sum === num;
+}
+
+export function nthRoot(value: number, n: number): number {
+    if (n <= 0) {
+        throw new Error('Root degree must be a positive integer');
+    }
+
+    if (value < 0 && n % 2 === 0) {
+        throw new Error('Cannot calculate even root of a negative number');
+    }
+
+    return Math.pow(value, 1 / n);
+}
+
+export function isAbundantNumber(n: number): boolean {
+    if (n <= 0) {
+        return false; // Abundant numbers are positive integers
+    }
+
+    let sumOfDivisors = 1; // Start with 1, as it's a proper divisor for all n > 1
+
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i === 0) {
+            sumOfDivisors += i;
+            if (i !== n / i) {
+                sumOfDivisors += n / i; // Add the corresponding divisor
+            }
+        }
+    }
+
+    return sumOfDivisors > n; // Abundant if sum of proper divisors is greater than n
+}
+
+export function isFibonacci(n: number): boolean {
+    if (n < 0) {
+        return false; // Fibonacci numbers are non-negative
+    }
+
+    // A number is a Fibonacci number if one of these conditions is true:
+    // 5*n^2 + 4 or 5*n^2 - 4 is a perfect square
+    const isPerfectSquare = (x: number): boolean => {
+        const s = Math.sqrt(x);
+        return s * s === x;
+    };
+
+    return isPerfectSquare(5 * n * n + 4) || isPerfectSquare(5 * n * n - 4);
+}
