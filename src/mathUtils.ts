@@ -650,3 +650,20 @@ export function nthRoot(value: number, n: number): number {
     
     return Math.pow(value, 1 / n);
 }
+
+export function isFibonacci(num: number): boolean {
+    if (num < 0) {
+        return false; // Fibonacci numbers are non-negative
+    }
+    
+    let a = 0;
+    let b = 1;
+    
+    while (b < num) {
+        const temp = b;
+        b += a;
+        a = temp;
+    }
+    
+    return b === num || num === 0; // Check if we reached the number or if it's 0
+}

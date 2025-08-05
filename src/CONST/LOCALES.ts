@@ -6,6 +6,7 @@ import type {ValueOf} from 'type-fest';
 const FULLY_SUPPORTED_LOCALES = {
     EN: 'en',
     ES: 'es',
+    FR: 'fr-FR',
 } as const;
 
 /**
