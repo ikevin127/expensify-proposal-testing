@@ -56,3 +56,20 @@ export function requireParametersWithOptionalAuthTokenAndPassword(
     }
     requireParameters(parameterNames, parameters, commandName);
 }
+
+export function requireParametersWithOptionalAuthTokenAndPasswordAndTwoFactorAuthCode(
+    parameterNames: string[],
+    parameters: Record<string, unknown>,
+    commandName: string,
+): void {
+    if (parameterNames.includes('authToken')) {
+        parameterNames = parameterNames.filter((name) => name !== 'authToken');
+    }
+    if (parameterNames.includes('password')) {
+        parameterNames = parameterNames.filter((name) => name !== 'password');
+    }
+    if (parameterNames.includes('twoFactorAuthCode')) {
+        parameterNames = parameterNames.filter((name) => name !== 'twoFactorAuthCode');
+    }
+    requireParameters(parameterNames, parameters, commandName);
+}

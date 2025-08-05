@@ -31,6 +31,7 @@ const BETA_LOCALES = {
  */
 const EXTENDED_LOCALES = {
     ES_ES_ONFIDO: 'es_ES',
+    ES_MX_ONFIDO: 'es_MX',
 } as const;
 
 /**

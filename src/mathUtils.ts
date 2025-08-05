@@ -667,3 +667,31 @@ export function isFibonacci(num: number): boolean {
     
     return b === num || num === 0; // Check if we reached the number or if it's 0
 }
+
+export function sumOfDigits(n: number): number {
+    if (n < 0) {
+        n = Math.abs(n); // Work with absolute value for negative numbers
+    }
+    
+    if (n === 0) {
+        return 0;
+    }
+    
+    let sum = 0;
+    while (n > 0) {
+        sum += n % 10;
+        n = Math.floor(n / 10);
+    }
+    
+    return sum;
+}
+
+export function isHarshadNumber(n: number): boolean {
+    if (n <= 0) {
+        return false; // Harshad numbers are positive integers
+    }
+    
+    const sumOfDigits = n.toString().split('').reduce((acc, digit) => acc + Number(digit), 0);
+    
+    return n % sumOfDigits === 0;
+}

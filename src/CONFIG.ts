@@ -32,6 +32,7 @@ export default {
         CLUSTER: 'mt1',
     },
     SITE_TITLE: 'New Expensify',
+    SITE_NAME: 'Expensify',
     SITE_URL: get(Config, 'SITE_URL', 'https://chat.expensify.com'),
     FAVICON: {
         DEFAULT: '/favicon.png',
