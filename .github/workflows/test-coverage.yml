@@ -53,10 +53,10 @@ jobs:
           cache: "npm"
       - run: npm install
 
-      - name: Run Jest shard ${{ matrix.shard }}
+      - name: Run Jest Shard ${{ matrix.shard }}
         run: npm run test:ci -- --shard=${{ matrix.shard }}/3 --passWithNoTests
 
-      - name: Check if coverage is non-empty
+      - name: Check If Coverage Is Empty
         id: check-coverage
         run: |
           if [ -s coverage/lcov.info ]; then
@@ -65,7 +65,7 @@ jobs:
             echo "hasCoverage=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Upload coverage to Codecov (if exists)
+      - name: Upload coverage to Codecov
         if: success() && steps.check-coverage.outputs.hasCoverage == 'true'
         uses: codecov/codecov-action@v5
         with:
