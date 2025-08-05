@@ -36,6 +36,7 @@ export default {
     SITE_NAME: 'Expensify',
     SITE_URL: get(Config, 'SITE_URL', 'https://chat.expensify.com'),
     SITE_URL_DEV: get(Config, 'SITE_URL_DEV', 'https://chat.dev.expensify.com'),
+    SITE_URL_STAGING: get(Config, 'SITE_URL_STAGING', 'https://chat.staging.expensify.com'),
     FAVICON: {
         DEFAULT: '/favicon.png',
         UNREAD: '/favicon-unread.png',

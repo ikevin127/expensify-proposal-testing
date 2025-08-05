@@ -41,6 +41,7 @@ import {
     isHarshadNumber,
     isAbundantNumber,
     isFibonacci,
+    isSphenicNumber,
 } from '../mathUtils';
 
 describe('Math Utils', () => {
@@ -887,6 +888,26 @@ describe('Math Utils', () => {
             expect(isAbundantNumber(1)).toBe(false);
             expect(isAbundantNumber(2)).toBe(false);
             expect(isAbundantNumber(3)).toBe(false);
+        });
+    })
+
+    describe('isSphenicNumber', () => {
+        test('should return true for sphenic numbers', () => {
+            expect(isSphenicNumber(30)).toBe(true);
+            expect(isSphenicNumber(42)).toBe(true);
+            expect(isSphenicNumber(66)).toBe(true);
+        });
+
+        test('should return false for non-sphenic numbers', () => {
+            expect(isSphenicNumber(12)).toBe(false); // 12 = 2^2 * 3
+            expect(isSphenicNumber(18)).toBe(false); // 18 = 2 * 3^2
+            expect(isSphenicNumber(28)).toBe(false); // 28 = 2^2 * 7
+        });
+
+        test('should handle small numbers', () => {
+            expect(isSphenicNumber(1)).toBe(false);
+            expect(isSphenicNumber(2)).toBe(false);
+            expect(isSphenicNumber(6)).toBe(true); // 6 = 2 * 3
         });
     })
 });

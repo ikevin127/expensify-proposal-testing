@@ -733,3 +733,25 @@ export function isDeficientNumber(n: number): boolean {
     
     return sumOfDivisors < n; // Deficient if sum of proper divisors is less than n
 }
+
+export function isSphenicNumber(n: number): boolean {
+    if (n <= 0) {
+        return false; // Sphenic numbers are positive integers
+    }
+    
+    let primeFactors = new Set<number>();
+    let temp = n;
+    
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        while (temp % i === 0) {
+            primeFactors.add(i);
+            temp /= i;
+        }
+    }
+    
+    if (temp > 1) {
+        primeFactors.add(temp); // Add the last prime factor if greater than 1
+    }
+    
+    return primeFactors.size === 3 && Array.from(primeFactors).every(isPrime);
+}
