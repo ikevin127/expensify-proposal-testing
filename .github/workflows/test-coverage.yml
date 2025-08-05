@@ -9,9 +9,11 @@ on:
         type: number
 
 jobs:
-  test:
-    name: Run tests and collect coverage
+  setup:
+    name: Install & Prepare
     runs-on: ubuntu-latest
+    outputs:
+      pr_sha: ${{ steps.pr-head.outputs.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,7 +28,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Get PR head SHA
         if: github.event.inputs.pr_number
@@ -37,22 +39,52 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run tests
-        run: npm run test:coverage
+  test-shards:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/merge', github.event.inputs.pr_number) || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+      - run: npm ci
 
-      - name: Upload coverage to Codecov
+      - name: Run Jest Shard ${{ matrix.shard }}
+        run: npm run test:coverage -- --shard=${{ matrix.shard }}/3 --passWithNoTests
+
+      - name: Check If Coverage Is Empty
+        id: check-coverage
+        run: |
+          if [ -s coverage/lcov.info ]; then
+            echo "hasCoverage=true" >> $GITHUB_OUTPUT
+          else
+            echo "hasCoverage=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Coverage to Codecov
+        if: success() && steps.check-coverage.outputs.hasCoverage == 'true'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: shard-${{ matrix.shard }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
-          override_commit: ${{ steps.pr-head.outputs.sha || github.sha }}
+          override_commit: ${{ needs.setup.outputs.pr_sha || github.sha }}
+          files: coverage/lcov.info
           verbose: true
 
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
+      - name: Upload Test Results to Codecov
+        if: ${{ !cancelled() }} && steps.check-coverage.outputs.hasCoverage == 'true'
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: shard-${{ matrix.shard }}
           override_pr: ${{ github.event.inputs.pr_number || '' }}
-          override_commit: ${{ steps.pr-head.outputs.sha || github.sha }}
+          override_commit: ${{ needs.setup.outputs.pr_sha || github.sha }}
           verbose: true
