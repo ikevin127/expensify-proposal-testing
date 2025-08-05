@@ -12,16 +12,12 @@ export default {
   },
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
-    "src/**/*.{ts,tsx,js,jsx}",
-    "!**/node_modules/**",
-    "!**/coverage/**",
+    'src/**/*.{ts,tsx,js,jsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.test.{ts,tsx,js,jsx}',
+    '!src/**/*.spec.{ts,tsx,js,jsx}',
   ],
-  coverageReporters: [
-    'json-summary',
-    'lcov',
-    'html',
-    'text-summary'
-  ],
+  coverageReporters: ['lcov'],
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)'
