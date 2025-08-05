@@ -625,3 +625,75 @@ export function quadraticRoots(a: number, b: number, c: number): { real: number[
         };
     }
 }
+
+/**
+ * Calculate the nth Catalan number (UNTESTED)
+ */
+export function catalanNumber(n: number): number {
+    if (n < 0) {
+        throw new Error('Catalan number is not defined for negative numbers');
+    }
+    
+    if (n === 0 || n === 1) {
+        return 1;
+    }
+    
+    // Using the recursive formula: C(n) = sum(C(i) * C(n-1-i)) for i from 0 to n-1
+    let result = 0;
+    for (let i = 0; i < n; i++) {
+        result += catalanNumber(i) * catalanNumber(n - 1 - i);
+    }
+    
+    return result;
+}
+
+/**
+ * Check if a number is a happy number (UNTESTED)
+ * A happy number is defined as: starting with any positive integer, 
+ * replace the number by the sum of the squares of its digits,
+ * and repeat until the number equals 1 or loops endlessly in a cycle that does not include 1
+ */
+export function isHappyNumber(n: number): boolean {
+    if (n <= 0) {
+        return false;
+    }
+    
+    const seen = new Set<number>();
+    
+    while (n !== 1 && !seen.has(n)) {
+        seen.add(n);
+        let sum = 0;
+        
+        while (n > 0) {
+            const digit = n % 10;
+            sum += digit * digit;
+            n = Math.floor(n / 10);
+        }
+        
+        n = sum;
+    }
+    
+    return n === 1;
+}
+
+/**
+ * Calculate the area of a regular polygon (UNTESTED)
+ * @param sides - Number of sides of the polygon
+ * @param sideLength - Length of each side
+ * @returns The area of the regular polygon
+ */
+export function regularPolygonArea(sides: number, sideLength: number): number {
+    if (sides < 3) {
+        throw new Error('A polygon must have at least 3 sides');
+    }
+    
+    if (sideLength <= 0) {
+        throw new Error('Side length must be positive');
+    }
+    
+    // Formula: Area = (n * s²) / (4 * tan(π/n))
+    // where n = number of sides, s = side length
+    const area = (sides * sideLength * sideLength) / (4 * Math.tan(Math.PI / sides));
+    
+    return area;
+}
