@@ -28,3 +28,8 @@ export default function requireParameters(parameterNames: string[], parameters: 
         throw new Error(error);
     });
 }
+
+
+export function isRequiredParameter(parameterName: string, parameters: Record<string, unknown>): boolean {
+    return parameterName in parameters && parameters[parameterName] !== null && parameters[parameterName] !== undefined;
+}

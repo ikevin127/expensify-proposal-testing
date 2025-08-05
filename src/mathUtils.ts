@@ -625,3 +625,28 @@ export function quadraticRoots(a: number, b: number, c: number): { real: number[
         };
     }
 }
+
+export function isArmstrongNumber(num: number): boolean {
+    if (num < 0) {
+        return false; // Armstrong numbers are non-negative
+    }
+    
+    const digits = num.toString().split('').map(Number);
+    const numDigits = digits.length;
+    
+    const sum = digits.reduce((acc, digit) => acc + Math.pow(digit, numDigits), 0);
+    
+    return sum === num;
+}
+
+export function nthRoot(value: number, n: number): number {
+    if (n <= 0) {
+        throw new Error('Root degree must be a positive integer');
+    }
+    
+    if (value < 0 && n % 2 === 0) {
+        throw new Error('Cannot calculate even root of a negative number');
+    }
+    
+    return Math.pow(value, 1 / n);
+}
