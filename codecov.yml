@@ -1,13 +1,7 @@
 coverage:
   status:
-    project:
-      default:
-        enabled: true
-        informational: true
-    patch:
-      default:
-        enabled: true
-        informational: true
+    project: off
+    patch: off
 
 comment:
   layout: "newheader, diff, files, tree, newfooter"
@@ -16,4 +10,4 @@ comment:
   require_base: false
   require_head: true
   hide_comment_details: true
-  after_n_builds: 3
+  after_n_builds: 1
